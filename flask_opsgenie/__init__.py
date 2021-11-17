@@ -4,6 +4,8 @@ import time
 from typing import Optional
 
 from flask import Flask, request, Response, g, _app_ctx_stack as stack
+from flask_opsgenie.opsgenie import raise_opsgenie_alert
+from flask_opsgenie.entities import AlertType
 
 CONFIG_ALERT_STATUS_CODES = "ALERT_STATUS_CODES"
 CONFIG_ALERT_STATUS_CLASSES = "ALERT_STATUS_CLASSES"
@@ -59,4 +61,12 @@ class FlaskOpsgenie(object):
 
         status_code = response.status_code
         status_class = self._get_status_class(status_code)
-        request_endpoint = request.endpoint
+        endpoint = request.url_rule
+
+        if (self._alert_status_codes and status_code in self._alert_status_codes) or \
+                (self._alert_status_classes and status_class in self._alert_status_classes):
+            if self._monitored_endpoints and endpoint in self._monitored_endpoints:
+                if self._alert_status_codes:
+                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code)
+                elif self._alert_status_classes:
+                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class)
