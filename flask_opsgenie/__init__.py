@@ -47,7 +47,7 @@ class FlaskOpsgenie(object):
         app.teardown_request(self._teardown_request)
 
     def _get_status_class(status_code: int) -> str:
-        return ""
+        return str(status_code)[0] + "XX"
 
     def _before_request(self):
         ctx = stack.top
