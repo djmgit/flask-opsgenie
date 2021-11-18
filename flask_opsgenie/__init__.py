@@ -14,6 +14,7 @@ CONFIG_IGNORED_ENDPOINTS = "IGNORED_ENDPOINTS"
 CONFIG_THRESHOLD_RESPONSE_TIME = "THRESHOLD_RESPONSE_TIME"
 CONFIG_RESPONSE_TIME_MONITORED_ENDPOINTS = "RESPONSE_TIME_MONITORED_ENDPOINTS"
 CONFIG_OPSGENIE_TOKEN = "OPSGENIE_TOKEN"
+CONFIG_ALERT_TAGS = "ALERT_TAGS"
 
 class FlaskOpsgenie(object):
 
@@ -28,6 +29,7 @@ class FlaskOpsgenie(object):
         self._threshold_response_time = None
         self._response_time_monitored_endpoints = None
         self._opsgenie_token = None
+        self._alert_tags = None
 
         if app is not None:
             self.init_app(app)
@@ -41,8 +43,12 @@ class FlaskOpsgenie(object):
         self._threshold_response_time = app.config.get(CONFIG_THRESHOLD_RESPONSE_TIME)
         self._response_time_monitored_endpoints = app.config.get(CONFIG_RESPONSE_TIME_MONITORED_ENDPOINTS)
         self._opsgenie_token = app.config.get(CONFIG_OPSGENIE_TOKEN)
+        self._alert_tags = app.config.get(CONFIG_ALERT_TAGS, {})
         self._opsgenie_token = app.config.get("")
-        self._host = socket.gethostbyname()
+        self._host = socket.gethostname()
+
+        # add host to alert tags as well
+        self._alert_tags["host"] = self._host
 
         app.before_request(self._before_request)
         app.after_request(self._after_request)
@@ -61,16 +67,16 @@ class FlaskOpsgenie(object):
 
         status_code = response.status_code
         status_class = self._get_status_class(status_code)
-        endpoint = request.url_rule
+        endpoint = request.path
 
         if (self._alert_status_codes and status_code in self._alert_status_codes) or \
                 (self._alert_status_classes and status_class in self._alert_status_classes):
             if (self._monitored_endpoints and endpoint in self._monitored_endpoints) or \
                     (not self._monitored_endpoints and endpoint not in self._ignored_endpoints):
                 if self._alert_status_codes:
-                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code)
+                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code, tags=self._alert_tags)
                 elif self._alert_status_classes:
-                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class)
+                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class, tags=self._alert_tags)
 
         if self._threshold_response_time and endpoint in self._response_time_monitored_endpoints:
             raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time)
