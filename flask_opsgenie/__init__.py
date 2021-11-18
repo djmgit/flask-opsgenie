@@ -79,4 +79,4 @@ class FlaskOpsgenie(object):
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class, tags=self._alert_tags)
 
         if self._threshold_response_time and endpoint in self._response_time_monitored_endpoints:
-            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time)
+            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, tags=self._alert_tags)
