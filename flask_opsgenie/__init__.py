@@ -65,8 +65,12 @@ class FlaskOpsgenie(object):
 
         if (self._alert_status_codes and status_code in self._alert_status_codes) or \
                 (self._alert_status_classes and status_class in self._alert_status_classes):
-            if self._monitored_endpoints and endpoint in self._monitored_endpoints:
+            if (self._monitored_endpoints and endpoint in self._monitored_endpoints) or \
+                    (not self._monitored_endpoints and endpoint not in self._ignored_endpoints):
                 if self._alert_status_codes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code)
                 elif self._alert_status_classes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class)
+
+        if self._threshold_response_time and endpoint in self._response_time_monitored_endpoints:
+            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time)
