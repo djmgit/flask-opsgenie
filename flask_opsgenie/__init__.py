@@ -19,6 +19,7 @@ CONFIG_ALERT_PRIORITY = "ALERT_PRIORITY"
 CONFIG_ALERT_ALIAS = "ALERT_ALIAS"
 CONFIG_RESPONDER = "RESPONDER"
 CONFIG_OPSGENIE_API_BASE = "OPSGENIE_API_BASE"
+CONFIG_SERVICE_ID = "SERVICE_ID"
 
 
 class FlaskOpsgenie(object):
@@ -39,6 +40,7 @@ class FlaskOpsgenie(object):
         self._alert_alias = None
         self._responder = None
         self._opsgenie_api_base = None
+        self._service_id = None
 
         if app is not None:
             self.init_app(app)
@@ -53,11 +55,11 @@ class FlaskOpsgenie(object):
         self._response_time_monitored_endpoints = app.config.get(CONFIG_RESPONSE_TIME_MONITORED_ENDPOINTS)
         self._opsgenie_token = app.config.get(CONFIG_OPSGENIE_TOKEN)
         self._alert_tags = app.config.get(CONFIG_ALERT_TAGS, {})
-        self._opsgenie_token = app.config.get(CONFIG_OPSGENIE_TOKEN)
         self._alert_alias = app.config.get(CONFIG_ALERT_ALIAS)
         self._alert_priority = app.config.get(CONFIG_ALERT_PRIORITY)
         self._responder = app.config.get(CONFIG_RESPONDER)
         self._opsgenie_api_base = app.config.get(CONFIG_OPSGENIE_API_BASE)
+        self._service_id = app.config.get(CONFIG_SERVICE_ID)
         self._host = socket.gethostname()
 
         # add host to alert tags as well
