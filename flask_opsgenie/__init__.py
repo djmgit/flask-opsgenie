@@ -20,6 +20,7 @@ CONFIG_ALERT_ALIAS = "ALERT_ALIAS"
 CONFIG_RESPONDER = "RESPONDER"
 CONFIG_OPSGENIE_API_BASE = "OPSGENIE_API_BASE"
 CONFIG_SERVICE_ID = "SERVICE_ID"
+OPSGENIE_API_BASE_US = "https://api.opsgenie.com"
 
 
 class FlaskOpsgenie(object):
@@ -56,9 +57,9 @@ class FlaskOpsgenie(object):
         self._opsgenie_token = app.config.get(CONFIG_OPSGENIE_TOKEN)
         self._alert_tags = app.config.get(CONFIG_ALERT_TAGS, {})
         self._alert_alias = app.config.get(CONFIG_ALERT_ALIAS)
-        self._alert_priority = app.config.get(CONFIG_ALERT_PRIORITY)
+        self._alert_priority = app.config.get(CONFIG_ALERT_PRIORITY, "P4")
         self._responder = app.config.get(CONFIG_RESPONDER)
-        self._opsgenie_api_base = app.config.get(CONFIG_OPSGENIE_API_BASE)
+        self._opsgenie_api_base = app.config.get(CONFIG_OPSGENIE_API_BASE, OPSGENIE_API_BASE_US)
         self._service_id = app.config.get(CONFIG_SERVICE_ID)
         self._host = socket.gethostname()
 
