@@ -113,3 +113,5 @@ class FlaskOpsgenie(object):
             raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, tags=self._alert_tags,
                                  opsgenie_alert_params=self.opsgenie_params_util())
 
+        return response
+

@@ -4,7 +4,30 @@ from flask_opsgenie.entities import AlertType, OpsgenieAlertParams
 
 def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_status_class:Optional[str] = None,
                                 opsgenie_alert_params:OpsgenieAlertParams=None):
-    pass
+    endpoint = request.path
+    url = request.url
+    method = request.method
+    summary = ""
+    description = ""
+
+    # add url info into tags
+    opsgenie_alert_params.alert_tags["endpoint"] = endpoint
+    opsgenie_alert_params.alert_tags["url"] = url
+    opsgenie_alert_params.alert_tags["method"] = method
+
+    # update the status code/class as well in tags, will help in searching
+    if alert_status_code:
+        opsgenie_alert_params.alert_tags["status_code"] = alert_status_code
+    else:
+        opsgenie_alert_params.alert_tags["status_class"] = alert_status_class
+
+    # update alias if not set
+    if not opsgenie_alert_params.alert_alias:
+        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_tags["service_id"]}-response-status-alert'
+
+    if alert_status_code:
+        summary = f'{endpoint} returned unaccepted status code : {alert_status_code} | Alert generated from flask'
+        description = ""
 
 
 def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:OpsgenieAlertParams=None):
@@ -13,10 +36,6 @@ def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:Opsgeni
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
                          alert_status_class:Optional[str] = None, elapsed_time:Optional[int] = None,
                          opsgenie_alert_params:OpsgenieAlertParams=None):
-
-    endpoint = request.path
-    url = request.url
-    method = request.method
 
     if alert_type == AlertType.STATUS_ALERT:
         if alert_status_code:
