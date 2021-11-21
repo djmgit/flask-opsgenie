@@ -6,6 +6,7 @@ from typing import Optional
 from flask import Flask, request, Response, g, _app_ctx_stack as stack
 from flask_opsgenie.opsgenie import raise_opsgenie_alert
 from flask_opsgenie.entities import AlertType
+from flask_opsgenie.entities import OpsgenieAlertParams
 
 CONFIG_ALERT_STATUS_CODES = "ALERT_STATUS_CODES"
 CONFIG_ALERT_STATUS_CLASSES = "ALERT_STATUS_CLASSES"
@@ -70,6 +71,17 @@ class FlaskOpsgenie(object):
         app.before_request(self._before_request)
         app.after_request(self._after_request)
         app.teardown_request(self._teardown_request)
+
+    def OpsgenieAlertParamsUtil(self) -> OpsgenieAlertParams:
+
+        return OpsgenieAlertParams(
+            opsgenie_token=self._opsgenie_token,
+            alert_tags=self._alert_tags,
+            alert_alias=self._alert_alias,
+            alert_priority=self._alert_priority,
+            alert_responder=self._responder,
+            opsgenie_api_base=self._opsgenie_api_base
+        )
 
     def _get_status_class(status_code: int) -> str:
         return str(status_code)[0] + "XX"
