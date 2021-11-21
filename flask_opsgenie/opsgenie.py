@@ -1,6 +1,21 @@
-from typing import Dict, Optional
+import requests
+from typing import Any, Dict, Optional
 from flask import request
 from flask_opsgenie.entities import AlertType, OpsgenieAlertParams
+
+
+def make_opsgenie_api_request(http_verb:str="GET", url:str=None, payload:Dict[str, Any]=None, opsgenie_token:str=None):
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f'GenieKey {opsgenie_token}'
+    }
+
+    response = getattr(requests, http_verb)(
+        url, headers=headers, json=payload
+    )
+    response.raise_for_status()
+
 
 def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_status_class:Optional[str] = None,
                                 opsgenie_alert_params:OpsgenieAlertParams=None):
@@ -47,6 +62,12 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
     # add responders if present
     if opsgenie_alert_params.alert_responder:
         payload["responders"] = opsgenie_alert_params.alert_responder
+    
+    # Now we are all set to make the alert api call to opsgenie
+    make_opsgenie_api_request(
+        http_verb="POST", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+        opsgenie_token=opsgenie_alert_params.opsgenie_token
+    )
 
 
 def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:OpsgenieAlertParams=None):
