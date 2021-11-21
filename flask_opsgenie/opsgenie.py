@@ -27,7 +27,26 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
 
     if alert_status_code:
         summary = f'{endpoint} returned unaccepted status code : {alert_status_code} | Alert generated from flask'
-        description = ""
+        description = f'{endpoint} returned status code : {alert_status_code}. Complete URL : {url} call with method ' \
+                      f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_tags["service_id"]} on host :' \
+                      f'{opsgenie_alert_params.alert_tags["host"]}'
+    if alert_status_class:
+        summary = f'{endpoint} returned unaccepted status class : {alert_status_class} | Alert generated from flask'
+        description = f'{endpoint} returned status code from class : {alert_status_class}. Complete URL : {url} call with method ' \
+                      f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_tags["service_id"]} on host :' \
+                      f'{opsgenie_alert_params.alert_tags["host"]}'
+
+    payload = {
+        "message": summary,
+        "description": description,
+        "alias": opsgenie_alert_params.alert_alias,
+        "tags": opsgenie_alert_params.alert_tags,
+        "priority": opsgenie_alert_params.alert_priority,
+    }
+
+    # add responders if present
+    if opsgenie_alert_params.alert_responder:
+        payload["responders"] = opsgenie_alert_params.alert_responder
 
 
 def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:OpsgenieAlertParams=None):
