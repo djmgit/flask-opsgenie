@@ -8,6 +8,16 @@ class AlertType(Enum):
     LATENCY_ALERT = 2
 
 
+class AlertPriority(Enum):
+
+    P0 = "P0"
+    P1 = "P1"
+    P2 = "P2"
+    P3 = "P3"
+    P4 = "P4"
+    P5 = "P5"
+
+
 class OpsgenieAlertParams:
 
     def __init__(self, opsgenie_token:str=None, alert_tags:Dict[str, str]=None, alert_alias:str=None,
@@ -17,7 +27,11 @@ class OpsgenieAlertParams:
         if not self.opsgenie_token:
             raise InvalidOpsgenieAlertParams(f'Missing opsgenie api token')
         self.alert_tags = alert_tags
+
+        # set default service id if not present
+        if not alert_tags.get("service_id"):
+            alert_tags["service_id"] = f'flask-service-{self.alert_tags["host"]}'
         self.alert_alias = alert_alias
-        self.alert_priority = alert_priority
+        self.alert_priority = AlertPriority(alert_priority)
         self.alert_responder = alert_responder
         self.opsgenie_api_base = opsgenie_api_base
