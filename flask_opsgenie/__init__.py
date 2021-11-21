@@ -72,7 +72,7 @@ class FlaskOpsgenie(object):
         app.after_request(self._after_request)
         app.teardown_request(self._teardown_request)
 
-    def OpsgenieAlertParamsUtil(self) -> OpsgenieAlertParams:
+    def opsgenie_params_util(self) -> OpsgenieAlertParams:
 
         return OpsgenieAlertParams(
             opsgenie_token=self._opsgenie_token,
@@ -105,7 +105,10 @@ class FlaskOpsgenie(object):
                 if self._alert_status_codes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code, tags=self._alert_tags)
                 elif self._alert_status_classes:
-                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class, tags=self._alert_tags)
+                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class,
+                                         opsgenie_alert_params=self.opsgenie_params_util())
 
         if self._threshold_response_time and endpoint in self._response_time_monitored_endpoints:
-            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, tags=self._alert_tags)
+            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, tags=self._alert_tags,
+                                 opsgenie_alert_params=self.opsgenie_params_util())
+
