@@ -71,7 +71,20 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
 
 
 def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:OpsgenieAlertParams=None):
-    pass
+    endpoint = request.path
+    url = request.url
+    method = request.method
+    summary = ""
+    description = ""
+
+    # add url info into tags
+    opsgenie_alert_params.alert_tags["endpoint"] = endpoint
+    opsgenie_alert_params.alert_tags["url"] = url
+    opsgenie_alert_params.alert_tags["method"] = method
+
+    # update alias if not set
+    if not opsgenie_alert_params.alert_alias:
+        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_tags["service_id"]}-response-latency-alert'
 
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
                          alert_status_class:Optional[str] = None, elapsed_time:Optional[int] = None,
