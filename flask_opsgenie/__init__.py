@@ -63,8 +63,9 @@ class FlaskOpsgenie(object):
         self._service_id = app.config.get(CONFIG_SERVICE_ID)
         self._host = socket.gethostname()
 
-        # add host to alert tags as well
+        # add host and service to alert tags as well
         self._alert_tags["host"] = self._host
+        self._alert_tags["service_id"] = self._service_id
 
         app.before_request(self._before_request)
         app.after_request(self._after_request)
