@@ -70,7 +70,7 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
     )
 
 
-def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:OpsgenieAlertParams=None):
+def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgenie_alert_params:OpsgenieAlertParams=None):
     endpoint = request.path
     url = request.url
     method = request.method
@@ -81,10 +81,35 @@ def raise_opsgenie_latency_alert(elapsed_time:int, opsgenie_alert_params:Opsgeni
     opsgenie_alert_params.alert_tags["endpoint"] = endpoint
     opsgenie_alert_params.alert_tags["url"] = url
     opsgenie_alert_params.alert_tags["method"] = method
+    opsgenie_alert_params.alert_alias["status_code"] = alert_status_code
 
     # update alias if not set
     if not opsgenie_alert_params.alert_alias:
         opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_tags["service_id"]}-response-latency-alert'
+
+    summary = f'{endpoint} showed unexpected response time : {elapsed_time}s | Alert generated from flask'
+    description = f'{endpoint} showed unexpected response time : {elapsed_time}s. Complete URL : {url} call with method ' \
+                    f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_tags["service_id"]} on host :' \
+                    f'{opsgenie_alert_params.alert_tags["host"]}'
+
+    payload = {
+        "message": summary,
+        "description": description,
+        "alias": opsgenie_alert_params.alert_alias,
+        "tags": opsgenie_alert_params.alert_tags,
+        "priority": opsgenie_alert_params.alert_priority,
+    }
+
+    # add responders if present
+    if opsgenie_alert_params.alert_responder:
+        payload["responders"] = opsgenie_alert_params.alert_responder
+
+    # Now we are all set to make the alert api call to opsgenie
+    make_opsgenie_api_request(
+        http_verb="POST", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+        opsgenie_token=opsgenie_alert_params.opsgenie_token
+    )
+
 
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
                          alert_status_class:Optional[str] = None, elapsed_time:Optional[int] = None,
@@ -97,4 +122,4 @@ def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional
             raise_opsgenie_status_alert(alert_status_class=alert_status_class, opsgenie_alert_params=opsgenie_alert_params)
 
     if alert_type == AlertType.LATENCY_ALERT:
-        raise_opsgenie_alert(elapsed_time=elapsed_time, opsgenie_alert_params=opsgenie_alert_params)
+        raise_opsgenie_latency_alert(elapsed_time=elapsed_time, alert_status_code=alert_status_code, opsgenie_alert_params=opsgenie_alert_params)
