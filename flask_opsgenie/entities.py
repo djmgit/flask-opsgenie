@@ -6,6 +6,7 @@ class AlertType(Enum):
 
     STATUS_ALERT = 1
     LATENCY_ALERT = 2
+    EXCEPTION = 3
 
 
 class AlertPriority(Enum):

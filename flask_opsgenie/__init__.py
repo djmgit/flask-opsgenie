@@ -103,15 +103,21 @@ class FlaskOpsgenie(object):
             if (self._monitored_endpoints and endpoint in self._monitored_endpoints) or \
                     (not self._monitored_endpoints and endpoint not in self._ignored_endpoints):
                 if self._alert_status_codes:
-                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code, tags=self._alert_tags)
+                    raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code,
+                                         opsgenie_alert_params=self.opsgenie_params_util())
                 elif self._alert_status_classes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class,
                                          opsgenie_alert_params=self.opsgenie_params_util())
 
         if self._threshold_response_time and endpoint in self._response_time_monitored_endpoints \
             and elapsed_time > self._threshold_response_time:
-            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, tags=self._alert_tags,
+            raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time,
                                  opsgenie_alert_params=self.opsgenie_params_util())
 
         return response
+
+    def _teardown_request(self, exception):
+
+        if exception:
+            raise_opsgenie_alert(AlertType.EXCEPTION, exception=exception, opsgenie_alert_params=self.opsgenie_params_util())
 
