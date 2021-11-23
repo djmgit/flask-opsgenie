@@ -111,6 +111,11 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     )
 
 
+def raise_opsgenie_exception_alert(exception=None, opsgenie_alert_params:OpsgenieAlertParams=None):
+
+    pass
+
+
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
                          alert_status_class:Optional[str] = None, elapsed_time:Optional[int] = None,
                          exception=None, opsgenie_alert_params:OpsgenieAlertParams=None):
@@ -122,4 +127,8 @@ def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional
             raise_opsgenie_status_alert(alert_status_class=alert_status_class, opsgenie_alert_params=opsgenie_alert_params)
 
     if alert_type == AlertType.LATENCY_ALERT:
-        raise_opsgenie_latency_alert(elapsed_time=elapsed_time, alert_status_code=alert_status_code, opsgenie_alert_params=opsgenie_alert_params)
+        raise_opsgenie_latency_alert(elapsed_time=elapsed_time, alert_status_code=alert_status_code,
+                                     opsgenie_alert_params=opsgenie_alert_params)
+
+    if alert_type == AlertType.EXCEPTION:
+        raise_opsgenie_exception_alert(exception=exception, opsgenie_alert_params=opsgenie_alert_params)
