@@ -83,7 +83,7 @@ class FlaskOpsgenie(object):
             opsgenie_api_base=self._opsgenie_api_base
         )
 
-    def _get_status_class(status_code: int) -> str:
+    def _get_status_class(self, status_code: int) -> str:
         return str(status_code)[0] + "XX"
 
     def _before_request(self):
@@ -101,7 +101,7 @@ class FlaskOpsgenie(object):
         if (self._alert_status_codes and status_code in self._alert_status_codes) or \
                 (self._alert_status_classes and status_class in self._alert_status_classes):
             if (self._monitored_endpoints and endpoint in self._monitored_endpoints) or \
-                    (not self._monitored_endpoints and endpoint not in self._ignored_endpoints):
+                    (not self._monitored_endpoints and not(self._ignored_endpoints and endpoint in self._ignored_endpoints)):
                 if self._alert_status_codes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code,
                                          opsgenie_alert_params=self.opsgenie_params_util())
