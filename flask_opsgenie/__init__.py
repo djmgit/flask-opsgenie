@@ -114,7 +114,7 @@ class FlaskOpsgenie(object):
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class,
                                          opsgenie_alert_params=self.opsgenie_params_util())
 
-        if self._threshold_response_time and endpoint in self._response_time_monitored_endpoints \
+        if self._threshold_response_time and self._path_present(endpoint, self._response_time_monitored_endpoints) \
             and elapsed_time > self._threshold_response_time:
             raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, alert_status_code=status_code,
                                  opsgenie_alert_params=self.opsgenie_params_util())
