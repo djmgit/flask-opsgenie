@@ -88,7 +88,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     if not opsgenie_alert_params.alert_alias:
         opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
 
-    summary = f'{endpoint} showed unexpected response time : {elapsed_time}s | Alert generated from flask'
+    summary = f'{endpoint} showed unexpected response time : {elapsed_time}ms | Alert generated from flask'
     description = f'{endpoint} showed unexpected response time : {elapsed_time}s. Complete URL : {url} call with method ' \
                     f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
                     f'{opsgenie_alert_params.alert_details["host"]}'
