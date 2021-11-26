@@ -65,7 +65,7 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
 
     # Now we are all set to make the alert api call to opsgenie
     make_opsgenie_api_request(
-        http_verb="POST", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+        http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
         opsgenie_token=opsgenie_alert_params.opsgenie_token
     )
 
@@ -106,7 +106,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
 
     # Now we are all set to make the alert api call to opsgenie
     make_opsgenie_api_request(
-        http_verb="POST", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+        http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
         opsgenie_token=opsgenie_alert_params.opsgenie_token
     )
 
