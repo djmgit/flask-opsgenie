@@ -17,6 +17,7 @@ CONFIG_THRESHOLD_RESPONSE_TIME = "THRESHOLD_RESPONSE_TIME"
 CONFIG_RESPONSE_TIME_MONITORED_ENDPOINTS = "RESPONSE_TIME_MONITORED_ENDPOINTS"
 CONFIG_OPSGENIE_TOKEN = "OPSGENIE_TOKEN"
 CONFIG_ALERT_TAGS = "ALERT_TAGS"
+CONFIG_ALERT_DETAILS = "ALERT_DETAILS"
 CONFIG_ALERT_PRIORITY = "ALERT_PRIORITY"
 CONFIG_ALERT_ALIAS = "ALERT_ALIAS"
 CONFIG_RESPONDER = "RESPONDER"
@@ -39,6 +40,7 @@ class FlaskOpsgenie(object):
         self._response_time_monitored_endpoints = None
         self._opsgenie_token = None
         self._alert_tags = None
+        self._alert_details = None
         self._alert_priority = None
         self._alert_alias = None
         self._responder = None
@@ -57,7 +59,8 @@ class FlaskOpsgenie(object):
         self._threshold_response_time = app.config.get(CONFIG_THRESHOLD_RESPONSE_TIME)
         self._response_time_monitored_endpoints = app.config.get(CONFIG_RESPONSE_TIME_MONITORED_ENDPOINTS)
         self._opsgenie_token = app.config.get(CONFIG_OPSGENIE_TOKEN)
-        self._alert_tags = app.config.get(CONFIG_ALERT_TAGS, {})
+        self._alert_tags = app.config.get(CONFIG_ALERT_TAGS)
+        self._alert_details = app.config.get(CONFIG_ALERT_DETAILS, {})
         self._alert_alias = app.config.get(CONFIG_ALERT_ALIAS)
         self._alert_priority = app.config.get(CONFIG_ALERT_PRIORITY, "P4")
         self._responder = app.config.get(CONFIG_RESPONDER)
@@ -65,9 +68,9 @@ class FlaskOpsgenie(object):
         self._service_id = app.config.get(CONFIG_SERVICE_ID)
         self._host = socket.gethostname()
 
-        # add host and service to alert tags as well
-        self._alert_tags["host"] = self._host
-        self._alert_tags["service_id"] = self._service_id
+        # add host and service to alert details as well
+        self._alert_details["host"] = self._host
+        self._alert_details["service_id"] = self._service_id
 
         app.before_request(self._before_request)
         app.after_request(self._after_request)
@@ -78,6 +81,7 @@ class FlaskOpsgenie(object):
         return OpsgenieAlertParams(
             opsgenie_token=self._opsgenie_token,
             alert_tags=self._alert_tags,
+            alert_details=self._alert_details,
             alert_alias=self._alert_alias,
             alert_priority=self._alert_priority,
             alert_responder=self._responder,

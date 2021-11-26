@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict
+from typing import Any, Dict, List
 from flask_opsgenie.exceptions import InvalidOpsgenieAlertParams
 
 class AlertType(Enum):
@@ -21,17 +21,23 @@ class AlertPriority(Enum):
 
 class OpsgenieAlertParams:
 
-    def __init__(self, opsgenie_token:str=None, alert_tags:Dict[str, str]=None, alert_alias:str=None,
+    def __init__(self, opsgenie_token:str=None, alert_tags:List[str]=None, alert_alias:str=None,
                  alert_priority:str=None, alert_responder:Dict[str, str]=None, opsgenie_api_base:str=None,
-                 ):
+                 alert_details:Dict[str, Any]=None):
         self.opsgenie_token = opsgenie_token,
         if not self.opsgenie_token:
             raise InvalidOpsgenieAlertParams(f'Missing opsgenie api token')
         self.alert_tags = alert_tags
 
+        # set a default tag
+        if not self.alert_tags:
+            self.alert_tags = ["flask-alert"]
+        self.alert_details = alert_details
+
         # set default service id if not present
-        if not alert_tags.get("service_id"):
-            alert_tags["service_id"] = f'flask-service-{self.alert_tags["host"]}'
+        if not self.alert_details.get("service_id"):
+            self.alert_details["service_id"] = f'flask-service-{self.alert_details["host"]}'
+
         self.alert_alias = alert_alias
         self.alert_priority = AlertPriority(alert_priority)
         self.alert_responder = alert_responder

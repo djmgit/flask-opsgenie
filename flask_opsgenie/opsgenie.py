@@ -25,37 +25,38 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
     summary = ""
     description = ""
 
-    # add url info into tags
-    opsgenie_alert_params.alert_tags["endpoint"] = endpoint
-    opsgenie_alert_params.alert_tags["url"] = url
-    opsgenie_alert_params.alert_tags["method"] = method
+    # add url info into details
+    opsgenie_alert_params.alert_details["endpoint"] = endpoint
+    opsgenie_alert_params.alert_details["url"] = url
+    opsgenie_alert_params.alert_details["method"] = method
 
-    # update the status code/class as well in tags, will help in searching
+    # update the status code/class as well in details, will help in searching
     if alert_status_code:
-        opsgenie_alert_params.alert_tags["status_code"] = alert_status_code
+        opsgenie_alert_params.alert_details["status_code"] = alert_status_code
     else:
-        opsgenie_alert_params.alert_tags["status_class"] = alert_status_class
+        opsgenie_alert_params.alert_details["status_class"] = alert_status_class
 
     # update alias if not set
     if not opsgenie_alert_params.alert_alias:
-        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_tags["service_id"]}-response-status-alert'
+        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-status-alert'
 
     if alert_status_code:
         summary = f'{endpoint} returned unaccepted status code : {alert_status_code} | Alert generated from flask'
         description = f'{endpoint} returned status code : {alert_status_code}. Complete URL : {url} call with method ' \
-                      f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_tags["service_id"]} on host: ' \
-                      f'{opsgenie_alert_params.alert_tags["host"]}'
+                      f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
+                      f'{opsgenie_alert_params.alert_details["host"]}'
     if alert_status_class:
         summary = f'{endpoint} returned unaccepted status class : {alert_status_class} | Alert generated from flask'
         description = f'{endpoint} returned status code from class : {alert_status_class}. Complete URL : {url} call with method ' \
-                      f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_tags["service_id"]} on host: ' \
-                      f'{opsgenie_alert_params.alert_tags["host"]}'
+                      f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
+                      f'{opsgenie_alert_params.alert_details["host"]}'
 
     payload = {
         "message": summary,
         "description": description,
         "alias": opsgenie_alert_params.alert_alias,
         "tags": opsgenie_alert_params.alert_tags,
+        "details": opsgenie_alert_params.alert_details,
         "priority": opsgenie_alert_params.alert_priority.value,
     }
 
@@ -77,26 +78,27 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     summary = ""
     description = ""
 
-    # add url info into tags
-    opsgenie_alert_params.alert_tags["endpoint"] = endpoint
-    opsgenie_alert_params.alert_tags["url"] = url
-    opsgenie_alert_params.alert_tags["method"] = method
-    opsgenie_alert_params.alert_tags["status_code"] = alert_status_code
+    # add url info into details
+    opsgenie_alert_params.alert_details["endpoint"] = endpoint
+    opsgenie_alert_params.alert_details["url"] = url
+    opsgenie_alert_params.alert_details["method"] = method
+    opsgenie_alert_params.alert_details["status_code"] = alert_status_code
 
     # update alias if not set
     if not opsgenie_alert_params.alert_alias:
-        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_tags["service_id"]}-response-latency-alert'
+        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
 
     summary = f'{endpoint} showed unexpected response time : {elapsed_time}s | Alert generated from flask'
     description = f'{endpoint} showed unexpected response time : {elapsed_time}s. Complete URL : {url} call with method ' \
-                    f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_tags["service_id"]} on host: ' \
-                    f'{opsgenie_alert_params.alert_tags["host"]}'
+                    f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
+                    f'{opsgenie_alert_params.alert_details["host"]}'
 
     payload = {
         "message": summary,
         "description": description,
         "alias": opsgenie_alert_params.alert_alias,
         "tags": opsgenie_alert_params.alert_tags,
+        "details": opsgenie_alert_params.alert_details,
         "priority": opsgenie_alert_params.alert_priority.value,
     }
 
