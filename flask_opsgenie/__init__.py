@@ -87,7 +87,7 @@ class FlaskOpsgenie(object):
     def _get_status_class(self, status_code: int) -> str:
         return str(status_code)[0] + "XX"
 
-    def _path_present(endpoint:str, endpoint_patterns:List[str]):
+    def _path_present(self, endpoint:str, endpoint_patterns:List[str]):
         match_results = [False if re.match(pattern, endpoint) == None else True for pattern in endpoint_patterns]
         return any(match_results)
 
@@ -105,8 +105,8 @@ class FlaskOpsgenie(object):
 
         if (self._alert_status_codes and status_code in self._alert_status_codes) or \
                 (self._alert_status_classes and status_class in self._alert_status_classes):
-            if (self._monitored_endpoints and endpoint in self._monitored_endpoints) or \
-                    (not self._monitored_endpoints and not(self._ignored_endpoints and endpoint in self._ignored_endpoints)):
+            if (self._monitored_endpoints and self._path_present(endpoint, self._monitored_endpoints)) or \
+                    (not self._monitored_endpoints and not(self._ignored_endpoints and self._path_present(endpoint, self._ignored_endpoints))):
                 if self._alert_status_codes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code,
                                          opsgenie_alert_params=self.opsgenie_params_util())
