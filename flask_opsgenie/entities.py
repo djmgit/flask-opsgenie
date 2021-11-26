@@ -24,7 +24,7 @@ class OpsgenieAlertParams:
     def __init__(self, opsgenie_token:str=None, alert_tags:List[str]=None, alert_alias:str=None,
                  alert_priority:str=None, alert_responder:Dict[str, str]=None, opsgenie_api_base:str=None,
                  alert_details:Dict[str, Any]=None):
-        self.opsgenie_token = opsgenie_token,
+        self.opsgenie_token = opsgenie_token
         if not self.opsgenie_token:
             raise InvalidOpsgenieAlertParams(f'Missing opsgenie api token')
         self.alert_tags = alert_tags
