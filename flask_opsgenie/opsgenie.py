@@ -42,12 +42,12 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
 
     if alert_status_code:
         summary = f'{endpoint} returned unaccepted status code : {alert_status_code} | Alert generated from flask'
-        description = f'{endpoint} returned status code : {alert_status_code}. Complete URL : {url} call with method ' \
+        description = f'{endpoint} returned status code : {alert_status_code}. Complete URL : {url} called with method ' \
                       f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
                       f'{opsgenie_alert_params.alert_details["host"]}'
     if alert_status_class:
         summary = f'{endpoint} returned unaccepted status class : {alert_status_class} | Alert generated from flask'
-        description = f'{endpoint} returned status code from class : {alert_status_class}. Complete URL : {url} call with method ' \
+        description = f'{endpoint} returned status code from class : {alert_status_class}. Complete URL : {url} called with method ' \
                       f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
                       f'{opsgenie_alert_params.alert_details["host"]}'
 
@@ -89,7 +89,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
         opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
 
     summary = f'{endpoint} showed unexpected response time : {elapsed_time}ms | Alert generated from flask'
-    description = f'{endpoint} showed unexpected response time : {elapsed_time}s. Complete URL : {url} call with method ' \
+    description = f'{endpoint} showed unexpected response time : {elapsed_time}s. Complete URL : {url} called with method ' \
                     f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
                     f'{opsgenie_alert_params.alert_details["host"]}'
 
