@@ -1,7 +1,8 @@
 import os
+import re
 import socket
 import time
-from typing import Optional
+from typing import List, Optional
 
 from flask import Flask, request, Response, g, _app_ctx_stack as stack
 from flask_opsgenie.opsgenie import raise_opsgenie_alert
@@ -85,6 +86,10 @@ class FlaskOpsgenie(object):
 
     def _get_status_class(self, status_code: int) -> str:
         return str(status_code)[0] + "XX"
+
+    def _path_present(endpoint:str, endpoint_patterns:List[str]):
+        match_results = [False if re.match(pattern, endpoint) == None else True for pattern in endpoint_patterns]
+        return any(match_results)
 
     def _before_request(self):
         ctx = stack.top
