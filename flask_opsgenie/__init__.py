@@ -70,7 +70,7 @@ class FlaskOpsgenie(object):
 
         # pre-process status_class list if present
         if self._alert_status_classes:
-            self._alert_status_classes = [s_class.uppper() for s_class in self._alert_status_classes]
+            self._alert_status_classes = [s_class.upper() for s_class in self._alert_status_classes]
 
         # add host and service to alert details as well
         self._alert_details["host"] = self._host
