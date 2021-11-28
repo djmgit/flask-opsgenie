@@ -89,7 +89,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
         opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
 
     summary = f'{endpoint} showed unexpected response time : {elapsed_time}ms | Alert generated from flask'
-    description = f'{endpoint} showed unexpected response time : {elapsed_time}s. Complete URL : {url} called with method ' \
+    description = f'{endpoint} showed unexpected response time : {elapsed_time}ms. Complete URL : {url} called with method ' \
                     f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
                     f'{opsgenie_alert_params.alert_details["host"]}'
 
@@ -113,9 +113,43 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     )
 
 
-def raise_opsgenie_exception_alert(exception=None, opsgenie_alert_params:OpsgenieAlertParams=None):
+def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_params:OpsgenieAlertParams=None):
 
-    pass
+    endpoint = request.path
+    url = request.url
+    method = request.method
+    summary = ""
+    description = ""
+
+    # add url info into details
+    opsgenie_alert_params.alert_details["endpoint"] = endpoint
+    opsgenie_alert_params.alert_details["url"] = url
+    opsgenie_alert_params.alert_details["method"] = method
+    opsgenie_alert_params.alert_details["exception"] = str(exception)
+
+    # update alias if not set
+    if not opsgenie_alert_params.alert_alias:
+        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-exception-alert'
+
+    summary = f'{endpoint} threw exception : {str(exception)} | Alert generated from flask'
+    description = f'{endpoint} has thrown exception : {str(exception)}. Complete URL : {url} called with method ' \
+                    f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
+                    f'{opsgenie_alert_params.alert_details["host"]}'
+
+    payload = {
+        "message": summary,
+        "description": description,
+        "alias": opsgenie_alert_params.alert_alias,
+        "tags": opsgenie_alert_params.alert_tags,
+        "details": opsgenie_alert_params.alert_details,
+        "priority": opsgenie_alert_params.alert_priority.value,
+    }
+
+    # Now we are all set to make the alert api call to opsgenie
+    make_opsgenie_api_request(
+        http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+        opsgenie_token=opsgenie_alert_params.opsgenie_token
+    )
 
 
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \

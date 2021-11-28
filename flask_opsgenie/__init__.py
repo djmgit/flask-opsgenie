@@ -23,6 +23,7 @@ CONFIG_ALERT_ALIAS = "ALERT_ALIAS"
 CONFIG_RESPONDER = "RESPONDER"
 CONFIG_OPSGENIE_API_BASE = "OPSGENIE_API_BASE"
 CONFIG_SERVICE_ID = "SERVICE_ID"
+CONFIG_ALERT_EXCEPTION = "ALERT_EXCEPTION"
 OPSGENIE_API_BASE_US = "https://api.opsgenie.com"
 
 
@@ -66,6 +67,7 @@ class FlaskOpsgenie(object):
         self._responder = app.config.get(CONFIG_RESPONDER)
         self._opsgenie_api_base = app.config.get(CONFIG_OPSGENIE_API_BASE, OPSGENIE_API_BASE_US)
         self._service_id = app.config.get(CONFIG_SERVICE_ID)
+        self._alert_exception = app.config.get(CONFIG_ALERT_EXCEPTION, False)
         self._host = socket.gethostname()
 
         # pre-process status_class list if present
@@ -131,6 +133,6 @@ class FlaskOpsgenie(object):
 
     def _teardown_request(self, exception):
 
-        if exception:
+        if self._alert_exception and exception:
             raise_opsgenie_alert(AlertType.EXCEPTION, exception=exception, opsgenie_alert_params=self.opsgenie_params_util())
 
