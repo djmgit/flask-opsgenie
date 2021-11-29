@@ -37,8 +37,8 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
         opsgenie_alert_params.alert_details["status_class"] = alert_status_class
 
     # update alias if not set
-    if not opsgenie_alert_params.alert_alias:
-        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-status-alert'
+    if not opsgenie_alert_params.alert_status_alias:
+        opsgenie_alert_params.alert_status_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-status-alert'
 
     if alert_status_code:
         summary = f'{endpoint} returned unaccepted status code : {alert_status_code} | Alert generated from flask'
@@ -54,7 +54,7 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
     payload = {
         "message": summary,
         "description": description,
-        "alias": opsgenie_alert_params.alert_alias,
+        "alias": opsgenie_alert_params.alert_status_alias,
         "tags": opsgenie_alert_params.alert_tags,
         "details": opsgenie_alert_params.alert_details,
         "priority": opsgenie_alert_params.alert_priority.value,
@@ -85,8 +85,8 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     opsgenie_alert_params.alert_details["status_code"] = alert_status_code
 
     # update alias if not set
-    if not opsgenie_alert_params.alert_alias:
-        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
+    if not opsgenie_alert_params.alert_latency_alias:
+        opsgenie_alert_params.alert_latency_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
 
     summary = f'{endpoint} showed unexpected response time : {elapsed_time}ms | Alert generated from flask'
     description = f'{endpoint} showed unexpected response time : {elapsed_time}ms. Complete URL : {url} called with method ' \
@@ -96,7 +96,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     payload = {
         "message": summary,
         "description": description,
-        "alias": opsgenie_alert_params.alert_alias,
+        "alias": opsgenie_alert_params.alert_latency_alias,
         "tags": opsgenie_alert_params.alert_tags,
         "details": opsgenie_alert_params.alert_details,
         "priority": opsgenie_alert_params.alert_priority.value,
@@ -128,8 +128,8 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     opsgenie_alert_params.alert_details["exception"] = str(exception)
 
     # update alias if not set
-    if not opsgenie_alert_params.alert_alias:
-        opsgenie_alert_params.alert_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-exception-alert'
+    if not opsgenie_alert_params.alert_exception_alias:
+        opsgenie_alert_params.alert_exception_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-exception-alert'
 
     summary = f'{endpoint} threw exception : {str(exception)} | Alert generated from flask'
     description = f'{endpoint} has thrown exception : {str(exception)}. Complete URL : {url} called with method ' \
@@ -139,7 +139,7 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     payload = {
         "message": summary,
         "description": description,
-        "alias": opsgenie_alert_params.alert_alias,
+        "alias": opsgenie_alert_params.alert_exception_alias,
         "tags": opsgenie_alert_params.alert_tags,
         "details": opsgenie_alert_params.alert_details,
         "priority": opsgenie_alert_params.alert_priority.value,
