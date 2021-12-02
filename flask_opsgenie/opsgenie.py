@@ -1,7 +1,11 @@
+import logging
 import requests
+from requests import HTTPError
 from typing import Any, Dict, Optional
 from flask import request
 from flask_opsgenie.entities import AlertType, OpsgenieAlertParams
+
+logger = logging.getLogger(__name__)
 
 
 def make_opsgenie_api_request(http_verb:str="GET", url:str=None, payload:Dict[str, Any]=None, opsgenie_token:str=None):
@@ -65,10 +69,13 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
         payload["responders"] = opsgenie_alert_params.alert_responder
 
     # Now we are all set to make the alert api call to opsgenie
-    make_opsgenie_api_request(
-        http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
-        opsgenie_token=opsgenie_alert_params.opsgenie_token
-    )
+    try:
+        make_opsgenie_api_request(
+            http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+            opsgenie_token=opsgenie_alert_params.opsgenie_token
+        )
+    except HTTPError as e:
+        logger.exception(e)
 
 
 def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgenie_alert_params:OpsgenieAlertParams=None):
@@ -107,10 +114,13 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
         payload["responders"] = opsgenie_alert_params.alert_responder
 
     # Now we are all set to make the alert api call to opsgenie
-    make_opsgenie_api_request(
-        http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
-        opsgenie_token=opsgenie_alert_params.opsgenie_token
-    )
+    try:
+        make_opsgenie_api_request(
+            http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+            opsgenie_token=opsgenie_alert_params.opsgenie_token
+        )
+    except HTTPError as e:
+        logger.exception(e)
 
 
 def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_params:OpsgenieAlertParams=None):
@@ -146,10 +156,13 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     }
 
     # Now we are all set to make the alert api call to opsgenie
-    make_opsgenie_api_request(
-        http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
-        opsgenie_token=opsgenie_alert_params.opsgenie_token
-    )
+    try:
+        make_opsgenie_api_request(
+            http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
+            opsgenie_token=opsgenie_alert_params.opsgenie_token
+        )
+    except HTTPError as e:
+        logger.exception(e)
 
 
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
