@@ -8,7 +8,7 @@ from flask_opsgenie.entities import AlertType, OpsgenieAlertParams
 logger = logging.getLogger(__name__)
 
 
-def make_opsgenie_api_request(http_verb:str="GET", url:str=None, payload:Dict[str, Any]=None, opsgenie_token:str=None):
+def make_opsgenie_api_request(http_verb:str="get", url:str=None, payload:Dict[str, Any]=None, opsgenie_token:str=None):
 
     headers = {
         "Content-Type": "application/json",
