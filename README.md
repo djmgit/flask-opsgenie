@@ -49,7 +49,7 @@ If we run this above tiny application and try to hit ``` /res500 ``` endpoint, i
 response status code and the given endpoint returns the same. If we want we can provide several status codes to be monitored like :
 ``` ALERT_STATUS_CODES = [500, 501, 502] ```
 This will generate an alert if any of the mentioned status codes is returned. So if you want to monitor for all the 5's status codes you can keep on mentioning
-all of them like ``` 500, 501, 502, 503 ...``` or even better you can use ``` ALERT_STATUS_CLASSES = ["5XX"] ``` instead of ```` ALERT_STATUS_CODES ```. As the
+all of them like ``` 500, 501, 502, 503 ...``` or even better you can use ``` ALERT_STATUS_CLASSES = ["5XX"] ``` instead of ``` ALERT_STATUS_CODES ```. As the
 name suggests ``` ALERT_STATUS_CLASSES ``` instructs flask-opsgenie to monitor for entire classes of status codes which in this case will be the ``` 5XX ``` class
 which means 500, 501, 502 and so on till 510. Isn't that cool?
 
