@@ -103,27 +103,30 @@ class TestOpsgenie(unittest.TestCase):
     def test_raise_opsgenie_alert(self, mock_opsgenie_exception_alert, mock_opsgenie_latency_alert, mock_opsgenie_status_alert):
 
         test_exception = mock.ANY
+        test_status_code = 500
+        test_status_calss = "5XX"
+        test_elapsed_time = 2000
 
-        _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_code=500,
+        _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_code=test_status_code,
                                  elapsed_time = None, opsgenie_alert_params=self.opsgenie_alert_params)
         self.assertEqual(mock_opsgenie_status_alert.call_count, 1)
         mock_opsgenie_status_alert.assert_called_with(
-            alert_status_code=500,
+            alert_status_code=test_status_code,
             opsgenie_alert_params=self.opsgenie_alert_params
         )
-        _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_class="5XX",
+        _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_class=test_status_calss,
                                  elapsed_time = None, opsgenie_alert_params=self.opsgenie_alert_params)
         self.assertEqual(mock_opsgenie_status_alert.call_count, 2)
         mock_opsgenie_status_alert.assert_called_with(
-            alert_status_class="5XX",
+            alert_status_class=test_status_calss,
             opsgenie_alert_params=self.opsgenie_alert_params
         )
-        _ = raise_opsgenie_alert(alert_type=AlertType.LATENCY_ALERT, alert_status_code=500,
-                                 elapsed_time=2000, opsgenie_alert_params=self.opsgenie_alert_params)
+        _ = raise_opsgenie_alert(alert_type=AlertType.LATENCY_ALERT, alert_status_code=test_status_code,
+                                 elapsed_time=test_elapsed_time, opsgenie_alert_params=self.opsgenie_alert_params)
         self.assertEqual(mock_opsgenie_latency_alert.call_count, 1)
         mock_opsgenie_latency_alert.assert_called_with(
-            elapsed_time=2000,
-            alert_status_code=500,
+            elapsed_time=test_elapsed_time,
+            alert_status_code=test_status_code,
             opsgenie_alert_params=self.opsgenie_alert_params
         )
         _ = raise_opsgenie_alert(alert_type=AlertType.EXCEPTION, exception=test_exception, opsgenie_alert_params=self.opsgenie_alert_params)
