@@ -23,6 +23,7 @@ def make_opsgenie_api_request(http_verb:str="get", url:str=None, payload:Dict[st
 
 def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_status_class:Optional[str] = None,
                                 opsgenie_alert_params:OpsgenieAlertParams=None):
+
     endpoint = request.path
     url = request.url
     method = request.method
