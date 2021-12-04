@@ -3,10 +3,10 @@ import unittest
 from flask import Flask
 from unittest import mock
 from flask_opsgenie import opsgenie
-from flask_opsgenie.entities import OpsgenieAlertParams
+from flask_opsgenie.entities import OpsgenieAlertParams, AlertType
 from flask_opsgenie.opsgenie import make_opsgenie_api_request
 from flask_opsgenie.opsgenie import (raise_opsgenie_status_alert, raise_opsgenie_latency_alert,
-                                     raise_opsgenie_exception_alert)
+                                     raise_opsgenie_exception_alert, raise_opsgenie_alert)
 
 class TestOpsgenie(unittest.TestCase):
 
@@ -96,3 +96,39 @@ class TestOpsgenie(unittest.TestCase):
                 payload=mock.ANY,
                 opsgenie_token=self.opsgenie_alert_params.opsgenie_token
             )
+
+    @mock.patch('flask_opsgenie.opsgenie.raise_opsgenie_status_alert')
+    @mock.patch('flask_opsgenie.opsgenie.raise_opsgenie_latency_alert')
+    @mock.patch('flask_opsgenie.opsgenie.raise_opsgenie_exception_alert')
+    def test_raise_opsgenie_alert(self, mock_opsgenie_exception_alert, mock_opsgenie_latency_alert, mock_opsgenie_status_alert):
+
+        test_exception = mock.ANY
+
+        _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_code=500,
+                                 elapsed_time = None, opsgenie_alert_params=self.opsgenie_alert_params)
+        self.assertEqual(mock_opsgenie_status_alert.call_count, 1)
+        mock_opsgenie_status_alert.assert_called_with(
+            alert_status_code=500,
+            opsgenie_alert_params=self.opsgenie_alert_params
+        )
+        _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_class="5XX",
+                                 elapsed_time = None, opsgenie_alert_params=self.opsgenie_alert_params)
+        self.assertEqual(mock_opsgenie_status_alert.call_count, 2)
+        mock_opsgenie_status_alert.assert_called_with(
+            alert_status_class="5XX",
+            opsgenie_alert_params=self.opsgenie_alert_params
+        )
+        _ = raise_opsgenie_alert(alert_type=AlertType.LATENCY_ALERT, alert_status_code=500,
+                                 elapsed_time=2000, opsgenie_alert_params=self.opsgenie_alert_params)
+        self.assertEqual(mock_opsgenie_latency_alert.call_count, 1)
+        mock_opsgenie_latency_alert.assert_called_with(
+            elapsed_time=2000,
+            alert_status_code=500,
+            opsgenie_alert_params=self.opsgenie_alert_params
+        )
+        _ = raise_opsgenie_alert(alert_type=AlertType.EXCEPTION, exception=test_exception, opsgenie_alert_params=self.opsgenie_alert_params)
+        self.assertEqual(mock_opsgenie_exception_alert.call_count, 1)
+        mock_opsgenie_exception_alert.assert_called_with(
+            exception=test_exception,
+            opsgenie_alert_params=self.opsgenie_alert_params
+        )
