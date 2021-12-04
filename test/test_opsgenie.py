@@ -1,9 +1,10 @@
 import unittest
 from flask import Flask
 from unittest import mock
+from flask_opsgenie import opsgenie
 from flask_opsgenie.entities import OpsgenieAlertParams
 from flask_opsgenie.opsgenie import make_opsgenie_api_request
-from flask_opsgenie.opsgenie import raise_opsgenie_status_alert
+from flask_opsgenie.opsgenie import raise_opsgenie_status_alert, raise_opsgenie_latency_alert
 
 class TestOpsgenie(unittest.TestCase):
 
@@ -43,4 +44,19 @@ class TestOpsgenie(unittest.TestCase):
             self.assertEqual(self.opsgenie_alert_params.alert_details['status_code'], 500)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('status_class'), None)
             self.assertEqual(self.opsgenie_alert_params.alert_status_alias, 'fake_service-response-status-alert')
+            self.assertEqual(mock_opsgenie_api_request.call_count, 1)
+
+    @mock.patch('flask_opsgenie.opsgenie.make_opsgenie_api_request')
+    def test_raise_opsgenie_latency_alert(self, mock_opsgenie_api_request):
+
+        app = Flask(__name__)
+        with app.test_client() as client:
+            rv = client.get('/test/og_params')
+            _ = raise_opsgenie_latency_alert(elapsed_time=2000, alert_status_code=500, opsgenie_alert_params=self.opsgenie_alert_params)
+            self.assertEqual(self.opsgenie_alert_params.alert_details['endpoint'], '/test/og_params')
+            self.assertEqual(self.opsgenie_alert_params.alert_details['method'], "GET")
+            self.assertEqual(self.opsgenie_alert_params.alert_details['url'], 'http://localhost/test/og_params')
+            self.assertEqual(self.opsgenie_alert_params.alert_details['status_code'], 500)
+            self.assertEqual(self.opsgenie_alert_params.alert_details.get('status_class'), None)
+            self.assertEqual(self.opsgenie_alert_params.alert_latency_alias, 'fake_service-response-latency-alert')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
