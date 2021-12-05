@@ -7,7 +7,7 @@ the on-call rockstar can get most of the details looking at the phone screen on 
 
 ## Getting flask-opsgenie
 
-Flask-opsgenie is not yet present on PyPI. To install flask-opsgenie you will have to install it from source, which is this repository
+Flask-opsgenie is not yet present on PyPI. To install flask-opsgenie we will have to install it from source, which is this repository
 
 - Clone this repo using ``` git clone https://github.com/djmgit/flask-opsgenie.git ```
 - ``` cd flask-opsgenie ```
@@ -30,6 +30,10 @@ class FlaskOpsgenieConfig:
     ALERT_TAGS = ["flask_status_alert"]
     ALERT_PRIORITY = "P3"
     SERVICE_ID = "my_flask_service
+    RESPONDER = [{
+        "type": "user",
+        "username": "neo@matrix"
+    }]
 
 app = Flask(__name__)
 app.config.from_object(FlaskOpsgenieConfig())
@@ -46,10 +50,15 @@ def res_500():
 ```
 
 If we run this above tiny application and try to hit ``` /res500 ``` endpoint, it will generate an opsgenie alert because we are monitoring for ``` 500 ```
-response status code and the given endpoint returns the same. If we want we can provide several status codes to be monitored like :
-``` ALERT_STATUS_CODES = [500, 501, 502] ```
-This will generate an alert if any of the mentioned status codes is returned. So if you want to monitor for all the 5's status codes you can keep on mentioning
-all of them like ``` 500, 501, 502, 503 ...``` or even better you can use ``` ALERT_STATUS_CLASSES = ["5XX"] ``` instead of ``` ALERT_STATUS_CODES ```. As the
+response status code and the given endpoint returns the same. 
+
+![Screenshot 2021-12-05 at 4 54 55 PM](https://user-images.githubusercontent.com/16368427/144744662-8b638b1f-7237-4b86-bd24-c37808c495e8.png)
+
+This is the alert we get out of the box using the bare minimum configuration we used above.
+
+If we want we can provide several status codes to be monitored like : ``` ALERT_STATUS_CODES = [500, 501, 502] ```
+This will generate an alert if any of the mentioned status codes is returned. So if we want to monitor for all the 5's status codes we can keep on mentioning
+all of them like ``` 500, 501, 502, 503 ...``` or even better we can use ``` ALERT_STATUS_CLASSES = ["5XX"] ``` instead of ``` ALERT_STATUS_CODES ```. As the
 name suggests ``` ALERT_STATUS_CLASSES ``` instructs flask-opsgenie to monitor for entire classes of status codes which in this case will be the ``` 5XX ``` class
 which means 500, 501, 502 and so on till 510. Isn't that cool?
 
