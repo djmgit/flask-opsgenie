@@ -54,7 +54,9 @@ response status code and the given endpoint returns the same.
 
 ![Screenshot 2021-12-05 at 4 54 55 PM](https://user-images.githubusercontent.com/16368427/144744662-8b638b1f-7237-4b86-bd24-c37808c495e8.png)
 
-This is the alert we get out of the box using the bare minimum configuration we used above.
+This is the alert we get out of the box using the bare minimum configuration we used above. As it can bee seen, flask-opsgenie decides for an appropriate alias
+for this alert so that similar alerts can be grouped in future. It also provides several details in the details section like the path, method, url and response
+of the request and additionaly the host which served the request. The alias can always be overriden as wekll.
 
 If we want we can provide several status codes to be monitored like : ``` ALERT_STATUS_CODES = [500, 501, 502] ```
 This will generate an alert if any of the mentioned status codes is returned. So if we want to monitor for all the 5's status codes we can keep on mentioning
