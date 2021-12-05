@@ -29,7 +29,7 @@ class FlaskOpsgenieConfig:
     OPSGENIE_TOKEN = os.getenv("API_KEY")
     ALERT_TAGS = ["flask_status_alert"]
     ALERT_PRIORITY = "P3"
-    SERVICE_ID = "my_flask_service
+    SERVICE_ID = "my_flask_service"
     RESPONDER = [{
         "type": "user",
         "username": "neo@matrix"
@@ -75,9 +75,9 @@ import time
 class FlaskOpsgenieConfig:
 
     OPSGENIE_TOKEN = os.getenv("API_KEY")
-    ALERT_TAGS = ["flask_status_alert"]
+    ALERT_TAGS = ["flask_latency_alert"]
     ALERT_PRIORITY = "P3"
-    SERVICE_ID = "my_flask_service
+    SERVICE_ID = "my_flask_service"
     THRESHOLD_RESPONSE_TIME = 2000.0 # time is required in ms
     RESPONSE_TIME_MONITORED_ENDPOINTS = ["^\/res_slow\/\d+\/info\/$"]
     RESPONDER = [{
@@ -108,3 +108,34 @@ Finally, we can also generate alert when a route throws an exception for some re
 raises an exception, the response returned will be 500/5XX and hence we can have an alert for that. However that is always not true with flask. If we use
 multiple ```@app.after_request``` decorated methods and if somehow one of those methods fail to return the respnse object at the end, the response (status 5XX)
 will not be sent back to the user. In such scenario this config option provided by flask-opsgenie can help us.
+Also the generated alert will have the exception in the alert body which can come quite handy for the on-call engineer.
+
+So now lets see one finall example for this configuration.
+
+```
+class FlaskOpsgenieConfig:
+
+    OPSGENIE_TOKEN = os.getenv("API_KEY")
+    ALERT_TAGS = ["flask_exception_alert"]
+    ALERT_PRIORITY = "P3"
+    SERVICE_ID = "my_flask_service"
+    ALERT_EXCEPTION = True
+    RESPONDER = [{
+        "type": "user",
+        "username": "neo@matrix"
+    }]
+
+app = Flask(__name__)
+app.config.from_object(FlaskOpsgenieConfig())
+flask_opsgenie = FlaskOpsgenie(None)
+flask_opsgenie.init_app(app)
+
+@app.route("/res_ex", methods=["GET"])
+def res_ex():
+    a = 1/0
+    return "I am assuming everything is fine, but there might be exception", 200
+
+```
+
+If we hit ```/res_ex```, flask_opsgenie will raise an alert since this route will be throwing a Division by Zero exception.
+
