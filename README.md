@@ -141,3 +141,6 @@ def res_ex():
 
 If we hit ```/res_ex```, flask_opsgenie will raise an alert since this route will be throwing a Division by Zero exception.
 
+![Screenshot 2021-12-05 at 5 44 31 PM](https://user-images.githubusercontent.com/16368427/144746096-49f3c6a4-aa25-4507-8c0a-798747b16ab9.png)
+
+For switching on exception monitoring all we need to do is add ```ALERT_EXCEPTION = True``` to our config.
