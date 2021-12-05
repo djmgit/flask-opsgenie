@@ -56,11 +56,46 @@ response status code and the given endpoint returns the same.
 
 This is the alert we get out of the box using the bare minimum configuration we used above. As it can bee seen, flask-opsgenie decides for an appropriate alias
 for this alert so that similar alerts can be grouped in future. It also provides several details in the details section like the path, method, url and response
-of the request and additionaly the host which served the request. The alias can always be overriden as wekll.
+of the request and additionaly the host which served the request. The alias can always be overriden as well.
 
 If we want we can provide several status codes to be monitored like : ``` ALERT_STATUS_CODES = [500, 501, 502] ```
 This will generate an alert if any of the mentioned status codes is returned. So if we want to monitor for all the 5's status codes we can keep on mentioning
 all of them like ``` 500, 501, 502, 503 ...``` or even better we can use ``` ALERT_STATUS_CLASSES = ["5XX"] ``` instead of ``` ALERT_STATUS_CODES ```. As the
 name suggests ``` ALERT_STATUS_CLASSES ``` instructs flask-opsgenie to monitor for entire classes of status codes which in this case will be the ``` 5XX ``` class
 which means 500, 501, 502 and so on till 510. Isn't that cool?
+We can also chose to monitor a given set of routes/endpoints, conversely we can chose to monitor all the endpoints for the response status code alert and decide
+to ignore a few. More on that later.
+
+We can also configure flask-opsgnie such that it generates an opsegenie alert when a monitored route breaches response time latency. Lets see an example for that.
+For this example let us consider the following flask snippet.
+
+```
+import time
+
+class FlaskOpsgenieConfig:
+
+    OPSGENIE_TOKEN = os.getenv("API_KEY")
+    ALERT_TAGS = ["flask_status_alert"]
+    ALERT_PRIORITY = "P3"
+    SERVICE_ID = "my_flask_service
+    THRESHOLD_RESPONSE_TIME = 2000.0 # time is required in ms
+    RESPONSE_TIME_MONITORED_ENDPOINTS = ["^\/res_slow\/\d+\/info\/$"]
+    RESPONDER = [{
+        "type": "user",
+        "username": "neo@matrix"
+    }]
+
+app = Flask(__name__)
+app.config.from_object(FlaskOpsgenieConfig())
+flask_opsgenie = FlaskOpsgenie(None)
+flask_opsgenie.init_app(app)
+
+@app.route("/res_slow/<id_num>/info/", methods=["GET"])
+def res_slow(id_num):
+    time.sleep(3)
+    return f'I am slow, {id_num}', 200
+```
+
+Once again, if we run this above tiny flask application and hit ```/res_slow/1/info/``` it will generate an opsgenie alert because the route takes more than
+2s or 2000ms to return a response.
 
