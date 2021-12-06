@@ -144,3 +144,9 @@ If we hit ```/res_ex```, flask_opsgenie will raise an alert since this route wil
 ![Screenshot 2021-12-05 at 5 44 31 PM](https://user-images.githubusercontent.com/16368427/144746096-49f3c6a4-aa25-4507-8c0a-798747b16ab9.png)
 
 For switching on exception monitoring all we need to do is add ```ALERT_EXCEPTION = True``` to our config.
+
+## Flask-opsgenie configuration in details
+
+As already shown in the quick start guide, initialising flask-opsgenie is pretty easy just like any other flask extention. We can either pass the flask app
+object to the FlaskOpsgenie constructor or use the the init method of initialising flask-opsgenie. We can load the config as an object or from a config file.
+
