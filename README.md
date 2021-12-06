@@ -150,3 +150,5 @@ For switching on exception monitoring all we need to do is add ```ALERT_EXCEPTIO
 As already shown in the quick start guide, initialising flask-opsgenie is pretty easy just like any other flask extention. We can either pass the flask app
 object to the FlaskOpsgenie constructor or use the the init method of initialising flask-opsgenie. We can load the config as an object or from a config file.
 
+In this section we will go through all the different config option that flask-opsgenie provides, how we can use them and what default values they assume.
+
