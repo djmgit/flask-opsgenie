@@ -152,3 +152,14 @@ object to the FlaskOpsgenie constructor or use the the init method of initialisi
 
 In this section we will go through all the different config option that flask-opsgenie provides, how we can use them and what default values they assume.
 
+### Config options provided by flask-opsgenie
+
+- **ALERT_STATUS_CODES** : This takes a list of status codes. Our flask service endpoints will be monitored against these response status codes. By default all
+the endpoints/routes will be monitored, but this can be controlled, as mentioned below.
+
+- **ALERT_STATUS_CLASS** : This takes a list of response status classes like ```5XX, 4XX or 3XX` etc. For example if the provided value is ```["5XX", "4XX"]```
+any request throwing a 501 or 502 or 404 or 403 etc will raise opsgenie alert. Again by default if this param is present, all the route response status codes
+will be monitored, however this too can be controlled. If both ```ALERT_STATUS_CODES``` and ```ALERT_STATUS_CLASS``` are provided, then ```ALERT_STATUS_CODES```
+will be given priority. That is if we are monitoring for both 501 and 5XX, there will be only one alert generated and not two.
+
+
