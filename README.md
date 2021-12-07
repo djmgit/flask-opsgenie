@@ -162,4 +162,9 @@ any request throwing a 501 or 502 or 404 or 403 etc will raise opsgenie alert. A
 will be monitored, however this too can be controlled. If both ```ALERT_STATUS_CODES``` and ```ALERT_STATUS_CLASS``` are provided, then ```ALERT_STATUS_CODES```
 will be given priority. That is if we are monitoring for both 501 and 5XX, there will be only one alert generated and not two.
 
+- **MONITORED_ENDPOINTS** : This takes in a list of regexes. With this we can limit the endpoints that will be monitored for or whose response status code/class
+will be matched against the provided params. The request endpoints will be matched against the given list of regexes and only the matching paths will be
+evaluated against the given rules. It is to be noted that the given regex should be provided keeping only the request/route path in mind, niether the complete
+url nor the query params.
+
 
