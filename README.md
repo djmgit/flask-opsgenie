@@ -172,4 +172,5 @@ the list of regex patterns provided.
 code/class alerts. If a path matches any of the regex present in this list, it wont be evaluated aginst any of the above mentioned rules. For this as well,
 only the request path is matched against the pattern, not the url or the arguments.
 
+- **THRESHOLD_RESPONSE_TIME** : This takes in a int or float and the number is interpretated as time duration in **miiliseconds**. 
 
