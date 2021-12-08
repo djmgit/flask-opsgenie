@@ -192,4 +192,14 @@ the default ones.
 - **SERVICE_ID** : As the name suggests, this option takes in a string as a service id. If this is not provided, flask-opsgenie comes up with a default service
 name which is ```flask-service-{host}```, where host is basically the hostname of the box or conatiner where the service is running.
 
-- **ALERT_ALIAS** : Takes in a string and uses it as the default alert alias when the alert type specific aliases are not present.
+- **ALERT_ALIAS** : Takes in a string and uses it as the default alert alias when the alert type specific aliases are not present. If this too is not present,
+then flask-opsgenie generates and uses a default alias depedning on the alert type.
+
+- **ALERT_STATUS_ALIAS** : Takes in a string and uses it as the alias for an alert generated for unwanted response status code. If this is not present then
+```ALERT_ALIAS``` value is used. If that too is not present then ```{service_id}-response-status-alert``` is used as the alias.
+
+- **ALERT_LATENCY_ALIAS**:  Takes in a string and uses it as the alias for an alert generated for breach of latency threshold. If this is not present then
+```ALERT_ALIAS``` value is used. If that too is not present then ```{service_id}-esponse-latency-alert``` is used as the alias.
+
+- **ALERT_EXCEPTION_ALIAS**: Takes in a string and uses it as the alias for an alert generated in response to an exception from a route. If this is not
+present then ```ALERT_ALIAS``` value is used. If that too is not present then ```{service_id}-exception-alert``` is used as the alias.
