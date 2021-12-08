@@ -181,6 +181,13 @@ generated.
 - **RESPONSE_TIME_MONITORED_ENDPOINTS** : As already mentioned in the previous line, this also takes a list of regex patterns to match against request paths
 (not to mention, only paths) for monitoring selective route paths against response time latency.
 
+- **ALERT_EXCEPTION** : Takes in a boolean. If this is present and is True then flask-opsgenie will also start monitoring for routes throwing exception to a
+request and will raise an Opsgenie alert if that happens. Now this might seem redundant as we could have already used status code monitoring for that since
+an exception would mean internal server error which would lead to a 5XX response. However, things get interesting when we use ```after_request``` methods
+in flask. We can have a chain of multiple after_request methods and each method should return the ```Response``` object at the end. If a method fails to
+return that Response object for some reason, the chain is broken and no response is sent. In such situation status code monitoring will not be of much
+help hence we can use this option then.
+
 - **OPSGENIE_TOKEN** : This is the opsgenie REST API integration token which flask-opsgenie will use on your behalf to invoke opsgenie REST API.
 
 - **ALERT_TAGS** : This takes in a list of strings which will be put as tags on the generated alert.
@@ -209,4 +216,5 @@ present then ```ALERT_ALIAS``` value is used. If that too is not present then ``
 - **RESPONDER** : The responder of your alert. Takes in a list of dictionary same as that accepted by the Opsgenie alert API. More can be found
 <a href="https://docs.opsgenie.com/docs/alert-api"> here </a> under responder field example. An example for adding an user can be
 ```[{"type": "user","username": "user@domain.com"}]```
+
 
