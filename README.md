@@ -188,3 +188,8 @@ generated.
 - **ALERT_DETAILS** : It takes a dictionary of keys and values. These are details provided along with the alert body. Flask-opsgenie will by default provided
 some details like request url, path, method, etc as can be seen in the screenshots above. Whatever we mention in this dictionary will be added over and above
 the default ones.
+
+- **SERVICE_ID** : As the name suggests, this option takes in a string as a service id. If this is not provided, flask-opsgenie comes up with a default service
+name which is ```flask-service-{host}```, where host is basically the hostname of the box or conatiner where the service is running.
+
+- **ALERT_ALIAS** : Takes in a string and uses it as the default alert alias when the alert type specific aliases are not present.
