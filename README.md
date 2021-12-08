@@ -198,8 +198,15 @@ then flask-opsgenie generates and uses a default alias depedning on the alert ty
 - **ALERT_STATUS_ALIAS** : Takes in a string and uses it as the alias for an alert generated for unwanted response status code. If this is not present then
 ```ALERT_ALIAS``` value is used. If that too is not present then ```{service_id}-response-status-alert``` is used as the alias.
 
-- **ALERT_LATENCY_ALIAS**:  Takes in a string and uses it as the alias for an alert generated for breach of latency threshold. If this is not present then
+- **ALERT_LATENCY_ALIAS** :  Takes in a string and uses it as the alias for an alert generated for breach of latency threshold. If this is not present then
 ```ALERT_ALIAS``` value is used. If that too is not present then ```{service_id}-esponse-latency-alert``` is used as the alias.
 
-- **ALERT_EXCEPTION_ALIAS**: Takes in a string and uses it as the alias for an alert generated in response to an exception from a route. If this is not
+- **ALERT_EXCEPTION_ALIAS** : Takes in a string and uses it as the alias for an alert generated in response to an exception from a route. If this is not
 present then ```ALERT_ALIAS``` value is used. If that too is not present then ```{service_id}-exception-alert``` is used as the alias.
+
+- **ALERT_PRIORITY** : One of ```P1|P2|P3|P4|P5```. Default is P4.
+
+- **RESPONDER** : The responder of your alert. Takes in a list of dictionary same as that accepted by the Opsgenie alert API. More can be found
+<a href="https://docs.opsgenie.com/docs/alert-api"> here </a> under responder field example. An example for adding an user can be
+```[{"type": "user","username": "user@domain.com"}]```
+
