@@ -190,6 +190,9 @@ help hence we can use this option then.
 
 - **OPSGENIE_TOKEN** : This is the opsgenie REST API integration token which flask-opsgenie will use on your behalf to invoke opsgenie REST API.
 
+- **OPSGENIE_API_BASE** : This takes in a string representing the Opsgenie REST API base. By default its Opsgenie US, however if we want we can override it
+with something else like EU.
+
 - **ALERT_TAGS** : This takes in a list of strings which will be put as tags on the generated alert.
 
 - **ALERT_DETAILS** : It takes a dictionary of keys and values. These are details provided along with the alert body. Flask-opsgenie will by default provided
