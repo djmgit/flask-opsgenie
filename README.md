@@ -180,3 +180,11 @@ generated.
 
 - **RESPONSE_TIME_MONITORED_ENDPOINTS** : As already mentioned in the previous line, this also takes a list of regex patterns to match against request paths
 (not to mention, only paths) for monitoring selective route paths against response time latency.
+
+- **OPSGENIE_TOKEN** : This is the opsgenie REST API integration token which flask-opsgenie will use on your behalf to invoke opsgenie REST API.
+
+- **ALERT_TAGS** : This takes in a list of strings which will be put as tags on the generated alert.
+
+- **ALERT_DETAILS** : It takes a dictionary of keys and values. These are details provided along with the alert body. Flask-opsgenie will by default provided
+some details like request url, path, method, etc as can be seen in the screenshots above. Whatever we mention in this dictionary will be added over and above
+the default ones.
