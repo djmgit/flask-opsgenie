@@ -172,5 +172,11 @@ the list of regex patterns provided.
 code/class alerts. If a path matches any of the regex present in this list, it wont be evaluated aginst any of the above mentioned rules. For this as well,
 only the request path is matched against the pattern, not the url or the arguments.
 
-- **THRESHOLD_RESPONSE_TIME** : This takes in a int or float and the number is interpretated as time duration in **miiliseconds**. 
+- **THRESHOLD_RESPONSE_TIME** : This takes in a int or float and the number is interpretated as time duration in **milliseconds**. With this param its mandatory
+to provide ```RESPONSE_TIME_MONITORED_ENDPOINTS``` as well which once again takes in a list of regex patterns to match against the requested route paths. So how
+its supposed to work is for every request path that matches any of the regex patterns present in ```RESPONSE_TIME_MONITORED_ENDPOINTS```, flask-opsgenie will
+compare the response time of that request against ```THRESHOLD_RESPONSE_TIME```, and if the response time exceeds this value then an opsgenie alert will be
+generated.
 
+- **RESPONSE_TIME_MONITORED_ENDPOINTS** : As already mentioned in the previous line, this also takes a list of regex patterns to match against request paths
+(not to mention, only paths) for monitoring selective route paths against response time latency.
