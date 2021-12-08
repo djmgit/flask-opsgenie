@@ -157,7 +157,7 @@ In this section we will go through all the different config option that flask-op
 - **ALERT_STATUS_CODES** : This takes a list of status codes. Our flask service endpoints will be monitored against these response status codes. By default all
 the endpoints/routes will be monitored, but this can be controlled, as mentioned below.
 
-- **ALERT_STATUS_CLASS** : This takes a list of response status classes like ```5XX, 4XX or 3XX` etc. For example if the provided value is ```["5XX", "4XX"]```
+- **ALERT_STATUS_CLASS** : This takes a list of response status classes like ```5XX, 4XX or 3XX``` etc. For example if the provided value is ```["5XX", "4XX"]```
 any request throwing a 501 or 502 or 404 or 403 etc will raise opsgenie alert. Again by default if this param is present, all the route response status codes
 will be monitored, however this too can be controlled. If both ```ALERT_STATUS_CODES``` and ```ALERT_STATUS_CLASS``` are provided, then ```ALERT_STATUS_CODES```
 will be given priority. That is if we are monitoring for both 501 and 5XX, there will be only one alert generated and not two.
@@ -165,6 +165,11 @@ will be given priority. That is if we are monitoring for both 501 and 5XX, there
 - **MONITORED_ENDPOINTS** : This takes in a list of regexes. With this we can limit the endpoints that will be monitored for or whose response status code/class
 will be matched against the provided params. The request endpoints will be matched against the given list of regexes and only the matching paths will be
 evaluated against the given rules. It is to be noted that the given regex should be provided keeping only the request/route path in mind, niether the complete
-url nor the query params.
+url nor the query params. For example if the requested url is ```https://mydomain.com/blog/1/info?theme=dark``` only ```/blog/1/info``` will be matched against
+the list of regex patterns provided.
+
+- **IGNORED_ENDPOINTS** : This takes a list of regexes. With this we can ignore a given set of route paths from being monitored for the response status
+code/class alerts. If a path matches any of the regex present in this list, it wont be evaluated aginst any of the above mentioned rules. For this as well,
+only the request path is matched against the pattern, not the url or the arguments.
 
 
