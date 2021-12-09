@@ -7,11 +7,9 @@ the on-call rockstar can get most of the details looking at the phone screen on 
 
 ## Getting flask-opsgenie
 
-Flask-opsgenie is not yet present on PyPI. To install flask-opsgenie we will have to install it from source, which is this repository
+Flask-opsgenie can be installed using pip. Make sure to have python 3+.
 
-- Clone this repo using ``` git clone https://github.com/djmgit/flask-opsgenie.git ```
-- ``` cd flask-opsgenie ```
-- ``` python3 setup.py install ```
+```pip install Flask-Opsgenie```
 
 ## Quick Start
 
