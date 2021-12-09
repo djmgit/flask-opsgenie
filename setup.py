@@ -21,11 +21,10 @@ def get_dependencies():
 setup(
     name="Flask-Opsgenie",
     url="https://github.com/djmgit/flask-opsgenie",
-    download_url="",
     license="",
     author="Deepjyoti Mondal",
     description="Opsgenie extension for Flask",
-    download_url="https://github.com/djmgit/flask-opsgenie/archive/refs/tags/v0.0.5.tar.gz",
+    download_url="https://github.com/djmgit/flask-opsgenie/archive/refs/tags/v0.0.6.tar.gz",
     long_description=__doc__,
     zip_safe=False,
     keywords = ['Alerting', 'flask', 'web', 'Reliability', 'DevOps'],
@@ -40,5 +39,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: DevOps :: monitoring :: alerting :: Reliability',
     ],
-    version='0.0.5'
+    version='0.0.6'
 )
