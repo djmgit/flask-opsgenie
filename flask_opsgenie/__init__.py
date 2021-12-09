@@ -148,4 +148,3 @@ class FlaskOpsgenie(object):
 
         if self._alert_exception and exception:
             raise_opsgenie_alert(AlertType.EXCEPTION, exception=exception, opsgenie_alert_params=self.opsgenie_params_util())
-
