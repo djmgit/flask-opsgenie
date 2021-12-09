@@ -33,11 +33,10 @@ setup(
     install_requires=get_dependencies(),
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Topic :: Internet :: WWW/HTTP :: DevOps :: monitoring :: alerting :: Reliability',
+        'Topic :: System :: Monitoring',
     ],
     version='0.0.6'
 )
