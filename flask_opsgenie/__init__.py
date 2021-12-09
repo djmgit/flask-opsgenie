@@ -36,7 +36,7 @@ class FlaskOpsgenie(object):
 
         self.app = app
         self._host = None
-        self._alert_statuse_codes = None
+        self._alert_status_codes = None
         self._alert_status_classes = None
         self._monitored_endpoints = None
         self._ignored_endpoints = None
@@ -129,7 +129,7 @@ class FlaskOpsgenie(object):
                 (self._alert_status_classes and status_class in self._alert_status_classes):
             if (self._monitored_endpoints and self._path_present(endpoint, self._monitored_endpoints)) or \
                     (not self._monitored_endpoints and not(self._ignored_endpoints and self._path_present(endpoint, self._ignored_endpoints))):
-                if self._alert_status_codes and status_code in self._alert_statuse_codes:
+                if self._alert_status_codes and status_code in self._alert_status_codes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code,
                                          opsgenie_alert_params=self.opsgenie_params_util())
                 elif self._alert_status_classes and status_class in self._alert_status_classes:
