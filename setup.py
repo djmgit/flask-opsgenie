@@ -40,5 +40,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: DevOps :: monitoring :: alerting :: Reliability',
     ],
-    vcversioner='0.0.2',
+    version='0.0.2',
 )
