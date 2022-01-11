@@ -27,6 +27,7 @@ CONFIG_RESPONDER = "RESPONDER"
 CONFIG_OPSGENIE_API_BASE = "OPSGENIE_API_BASE"
 CONFIG_SERVICE_ID = "SERVICE_ID"
 CONFIG_ALERT_EXCEPTION = "ALERT_EXCEPTION"
+CONFIG_NO_TRACEBACK = "NO_TRACEBACK"
 OPSGENIE_API_BASE_US = "https://api.opsgenie.com"
 
 
@@ -77,6 +78,7 @@ class FlaskOpsgenie(object):
         self._opsgenie_api_base = app.config.get(CONFIG_OPSGENIE_API_BASE, OPSGENIE_API_BASE_US)
         self._service_id = app.config.get(CONFIG_SERVICE_ID)
         self._alert_exception = app.config.get(CONFIG_ALERT_EXCEPTION, False)
+        self._no_traceback = app.config.get(CONFIG_NO_TRACEBACK, False)
         self._host = socket.gethostname()
 
         # pre-process status_class list if present
@@ -101,6 +103,7 @@ class FlaskOpsgenie(object):
             alert_status_alias=self._alert_status_alias,
             alert_latency_alias=self._alert_latency_alias,
             alert_exception_alias=self._alert_exception_alias,
+            no_traceback = self._no_traceback,
             alert_priority=self._alert_priority,
             alert_responder=self._responder,
             opsgenie_api_base=self._opsgenie_api_base

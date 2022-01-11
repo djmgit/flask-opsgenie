@@ -1,6 +1,7 @@
 import logging
 import requests
 from requests import HTTPError
+import traceback
 from typing import Any, Dict, Optional
 from flask import request
 from flask_opsgenie.entities import AlertType, OpsgenieAlertParams
@@ -145,7 +146,7 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     summary = f'{endpoint} threw exception : {str(exception)} | Alert generated from flask'
     description = f'{endpoint} has thrown exception : {str(exception)}. Complete URL : {url} called with method ' \
                     f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
-                    f'{opsgenie_alert_params.alert_details["host"]}'
+                    f'{opsgenie_alert_params.alert_details["host"]}.'
 
     payload = {
         "message": summary,
@@ -159,6 +160,13 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     # add responders if present
     if opsgenie_alert_params.alert_responder:
         payload["responders"] = opsgenie_alert_params.alert_responder
+
+    # if traceback is not silenced then add traceback
+    if not opsgenie_alert_params.no_traceback:
+        traceback_str = "".join(traceback.format_exception(etype=type(exception),
+                                                           value=exception, tb=exception.__traceback__))
+        payload["description"] = f'{description} {traceback_str}'
+        payload["details"]["Traceback"] = traceback_str
 
     # Now we are all set to make the alert api call to opsgenie
     try:
