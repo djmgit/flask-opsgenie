@@ -156,6 +156,10 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
         "priority": opsgenie_alert_params.alert_priority.value,
     }
 
+    # add responders if present
+    if opsgenie_alert_params.alert_responder:
+        payload["responders"] = opsgenie_alert_params.alert_responder
+
     # Now we are all set to make the alert api call to opsgenie
     try:
         make_opsgenie_api_request(
