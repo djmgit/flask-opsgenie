@@ -18,6 +18,7 @@ For an easy to get started with example, lets say we want to generate an opsgeni
 flask-opsgenie we do not need to write our own middleware code to generate the alert.
 
 ```
+import os
 from flask import Flask
 from flask_opsgenie import FlaskOpsgenie
 
@@ -45,6 +46,10 @@ def index():
 @app.route("/res500", methods=["GET"])
 def res_500():
     return "This is a 500", 500
+    
+if __name__ == "__main__":
+    app.run("127.0.0.1", 8080)
+
 ```
 
 If we run this above tiny application and try to hit ``` /res500 ``` endpoint, it will generate an opsgenie alert because we are monitoring for ``` 500 ```
@@ -69,6 +74,9 @@ For this example let us consider the following flask snippet.
 
 ```
 import time
+import os
+from flask import Flask
+from flask_opsgenie import FlaskOpsgenie
 
 class FlaskOpsgenieConfig:
 
@@ -91,7 +99,11 @@ flask_opsgenie.init_app(app)
 @app.route("/res_slow/<id_num>/info/", methods=["GET"])
 def res_slow(id_num):
     time.sleep(3)
-    return f'I am slow, {id_num}', 200
+    return f'I am slow, {id_num}', 
+    
+if __name__ == "__main__":
+    app.run("127.0.0.1", 8080)
+
 ```
 
 Once again, if we run this above tiny flask application and hit ```/res_slow/1/info/``` it will generate an opsgenie alert because the route takes more than
@@ -110,38 +122,77 @@ multiple ```@app.after_request``` decorated methods and if somehow one of those 
 will not be sent back to the user. In such scenario this config option provided by flask-opsgenie can help us.
 Also the generated alert will have the exception in the alert body which can come quite handy for the on-call engineer.
 
-So now lets see one finall example for this configuration.
+There are two cases to it:
+1. To raise alert on unhandled Exceptions:
+   For unhandled exceptions, flask has a beautiful way to handle it via decorator ```@app.errorhandler(Exception)```. User needs to call ```flask_opsgenie``` function with exception to raise the alert. No separate config is required
+
+2. To raise alert on handled Exceptions:
+   To raise alerts for handled exception, call function ```flask_opsgenie.raise_exception_alert``` with exceotion and stack-trace (if you want). You can also add function-name to it to make it more descriptive.
+
+
+ 
 
 ```
+# Raise alert for unhandled Exceptions
+
+import os, traceback
+from flask import Flask
+from flask_opsgenie import FlaskOpsgenie, AlertType
+
 class FlaskOpsgenieConfig:
 
     OPSGENIE_TOKEN = os.getenv("API_KEY")
     ALERT_TAGS = ["flask_exception_alert"]
     ALERT_PRIORITY = "P3"
     SERVICE_ID = "my_flask_service"
-    ALERT_EXCEPTION = True
     RESPONDER = [{
         "type": "user",
         "username": "neo@matrix"
     }]
+    ALERT_ALIAS = "handled_exception"
+    ALERT_EXCEPTION_ALIAS = "unhandled_exception"
 
 app = Flask(__name__)
 app.config.from_object(FlaskOpsgenieConfig())
 flask_opsgenie = FlaskOpsgenie(None)
 flask_opsgenie.init_app(app)
 
-@app.route("/res_ex", methods=["GET"])
-def res_ex():
+@app.errorhandler(Exception)
+def exception_handler(e: Exception):
+    """Handler for generic Exceptions occurring in the Application"""
+    
+    flask_opsgenie.raise_exception_alert(alert_type=AlertType.EXCEPTION, exception=e)
+    return {'Error': str(e)}, 500
+
+
+@app.route("/unhandledException", methods=["GET"])
+def unhandled_exception_case():
     a = 1/0
     return "I am assuming everything is fine, but there might be exception", 200
+
+
+@app.route("/handledException", methods=["GET"])
+def handled_exception_case():
+    try:
+        a = 1/0
+    except Exception as e:
+        flask_opsgenie.raise_exception_alert(alert_type=AlertType.MANUAL, exception=e, func_name="handle_exception_case")
+
+    return "I am assuming everything is fine, but there might be exception", 200
+    
+if __name__ == "__main__":
+    app.run("127.0.0.1", 8080)
+
 
 ```
 
 If we hit ```/res_ex```, flask_opsgenie will raise an alert since this route will be throwing a Division by Zero exception.
+The difference between two alerts for two cases would be in ```Alias```. 
+- Unhandled Exception: Alias format -> ```SERVICE_ID-<exception-name>-ALERT_EXCEPTION_ALIAS```
+- Handled Exception: Alias format -> ```SERVICE_ID-<funcname>-<exception-name>-ALERT_ALIAS```
 
-![Screenshot 2021-12-05 at 5 44 31 PM](https://user-images.githubusercontent.com/16368427/144746096-49f3c6a4-aa25-4507-8c0a-798747b16ab9.png)
+![Screenshot 2021-12-05 at 5 44 31 PM](/Users/sgupta8/Desktop/Screenshot 2022-01-21 at 1.44.35 PM.png)
 
-For switching on exception monitoring all we need to do is add ```ALERT_EXCEPTION = True``` to our config.
 
 ## Flask-opsgenie configuration in details
 
@@ -178,13 +229,6 @@ generated.
 
 - **RESPONSE_TIME_MONITORED_ENDPOINTS** : As already mentioned in the previous line, this also takes a list of regex patterns to match against request paths
 (not to mention, only paths) for monitoring selective route paths against response time latency.
-
-- **ALERT_EXCEPTION** : Takes in a boolean. If this is present and is True then flask-opsgenie will also start monitoring for routes throwing exception to a
-request and will raise an Opsgenie alert if that happens. Now this might seem redundant as we could have already used status code monitoring for that since
-an exception would mean internal server error which would lead to a 5XX response. However, things get interesting when we use ```after_request``` methods
-in flask. We can have a chain of multiple after_request methods and each method should return the ```Response``` object at the end. If a method fails to
-return that Response object for some reason, the chain is broken and no response is sent. In such situation status code monitoring will not be of much
-help hence we can use this option then.
 
 - **OPSGENIE_TOKEN** : This is the opsgenie REST API integration token which flask-opsgenie will use on your behalf to invoke opsgenie REST API.
 

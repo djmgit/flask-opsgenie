@@ -91,7 +91,6 @@ class FlaskOpsgenie(object):
 
         app.before_request(self._before_request)
         app.after_request(self._after_request)
-        app.teardown_request(self._teardown_request)
 
     def opsgenie_params_util(self) -> OpsgenieAlertParams:
 
@@ -134,10 +133,10 @@ class FlaskOpsgenie(object):
                     (not self._monitored_endpoints and not(self._ignored_endpoints and self._path_present(endpoint, self._ignored_endpoints))):
                 if self._alert_status_codes and status_code in self._alert_status_codes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code,
-                                         opsgenie_alert_params=self.opsgenie_params_util())
+                                         opsgenie_alert_params=self.opsgenie_params_util(), response_status_code=status_code)
                 elif self._alert_status_classes and status_class in self._alert_status_classes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class,
-                                         opsgenie_alert_params=self.opsgenie_params_util())
+                                         opsgenie_alert_params=self.opsgenie_params_util(), response_status_code=status_code)
 
         if self._threshold_response_time and self._response_time_monitored_endpoints and \
                 self._path_present(endpoint, self._response_time_monitored_endpoints) \
@@ -147,7 +146,5 @@ class FlaskOpsgenie(object):
 
         return response
 
-    def _teardown_request(self, exception):
-
-        if self._alert_exception and exception:
-            raise_opsgenie_alert(AlertType.EXCEPTION, exception=exception, opsgenie_alert_params=self.opsgenie_params_util())
+    def raise_exception_alert(self, alert_type:AlertType = None, exception=None, func_name:str=None):
+        raise_opsgenie_alert(alert_type=alert_type, exception=exception, func_name=func_name, opsgenie_alert_params=self.opsgenie_params_util())
