@@ -128,8 +128,6 @@ There are two cases to it:
 
 2. To raise alert on handled Exceptions:
    To raise alerts for handled exception, call function ```flask_opsgenie.raise_exception_alert``` with exceotion and stack-trace (if you want). You can also add function-name to it to make it more descriptive.
-
-
  
 
 ```
@@ -193,6 +191,58 @@ The difference between two alerts for two cases would be in ```Alias```.
 
 ![Screenshot 2021-12-05 at 5 44 31 PM](/Users/sgupta8/Desktop/Screenshot 2022-01-21 at 1.44.35 PM.png)
 
+### Support for gevent Exceptions
+Another case for exception handling is when you are using ```gevent``` in flask app. In case of ```gevent```, exception will not propagate to main thread, hence flask-opsgenie will not be able to raise any opsgenie Alert. 
+To handle this, user needs to invoke a callback to link gevent exception to main thread. 
+
+```
+# Raise alert for gevent Exceptions
+
+import os, traceback
+from flask import Flask
+from flask_opsgenie import FlaskOpsgenie, AlertType
+
+class FlaskOpsgenieConfig:
+
+    OPSGENIE_TOKEN = os.getenv("API_KEY")
+    ALERT_TAGS = ["flask_exception_alert"]
+    ALERT_PRIORITY = "P3"
+    SERVICE_ID = "my_flask_service"
+    RESPONDER = [{
+        "type": "user",
+        "username": "neo@matrix"
+    }]
+    ALERT_ALIAS = "handled_exception"
+    ALERT_EXCEPTION_ALIAS = "unhandled_exception"
+
+app = Flask(__name__)
+app.config.from_object(FlaskOpsgenieConfig())
+flask_opsgenie = FlaskOpsgenie(None)
+flask_opsgenie.init_app(app)
+
+@app.errorhandler(Exception)
+def exception_handler(e: Exception):
+    """Handler for generic Exceptions occurring in the Application"""
+    
+    flask_opsgenie.raise_exception_alert(alert_type=AlertType.EXCEPTION, exception=e)
+    return {'Error': str(e)}, 500
+
+
+@app.route("/geventException", methods=["GET"])
+def unhandled_exception_case():
+    g = gevent.spawn(inner_func)
+    flask_opsgenie.gevent_exception_callback(g)
+    return "I am assuming everything is fine, but there might be exception", 200
+
+
+def inner_func():
+    time.sleep(2)
+    a = 1/0
+
+    
+if __name__ == "__main__":
+    app.run("127.0.0.1", 8080)
+```
 
 ## Flask-opsgenie configuration in details
 
