@@ -148,3 +148,12 @@ class FlaskOpsgenie(object):
 
     def raise_exception_alert(self, alert_type:AlertType = None, exception=None, func_name:str=None):
         raise_opsgenie_alert(alert_type=alert_type, exception=exception, func_name=func_name, opsgenie_alert_params=self.opsgenie_params_util())
+
+    def raise_gevent_exception_alert(self, greenlet):
+        try:
+            greenlet.get()
+        except Exception as e:
+            self.raise_exception_alert(alert_type=AlertType.MANUAL, exception=e, func_name="gevent")
+
+    def gevent_exception_callback(self, g):
+        g.link_exception(self.raise_gevent_exception_alert)
