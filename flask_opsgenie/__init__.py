@@ -8,6 +8,7 @@ from flask import Flask, request, Response, g, _app_ctx_stack as stack
 from flask_opsgenie.opsgenie import raise_opsgenie_alert
 from flask_opsgenie.entities import AlertType
 from flask_opsgenie.entities import OpsgenieAlertParams
+from http import HTTPStatus
 
 CONFIG_ALERT_STATUS_CODES = "ALERT_STATUS_CODES"
 CONFIG_ALERT_STATUS_CLASSES = "ALERT_STATUS_CLASSES"
@@ -124,6 +125,9 @@ class FlaskOpsgenie(object):
         elapsed_time = (time.time() - ctx._flask_request_begin_at) * 1000
 
         status_code = response.status_code
+
+        # get value if status code is of type enum HTTPStatus
+        status_code = status_code.value if type(status_code) == HTTPStatus else status_code
         status_class = self._get_status_class(status_code)
         endpoint = request.path
 
