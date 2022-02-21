@@ -1,3 +1,5 @@
+ ![master](https://github.com/djmgit/flask-opsgenie/actions/workflows/run_tests.yml/badge.svg?branch=master)
+
 # Flask Opsgenie
 
 Flask-opsgenie is a flask extension for creating alerts on Opsgenie. Once configured flask-opsgenie can generate an opsgenie alert once a desired condition is met,
