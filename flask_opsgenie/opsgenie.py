@@ -127,7 +127,8 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
         logger.exception(e)
 
 
-def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_params:OpsgenieAlertParams=None):
+def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_params:OpsgenieAlertParams=None,
+                                   extra_props: Dict[str,str] = {}):
 
     endpoint = request.path
     url = request.url
@@ -138,6 +139,9 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     opsgenie_alert_params.alert_details["url"] = url
     opsgenie_alert_params.alert_details["method"] = method
     opsgenie_alert_params.alert_details["exception"] = str(exception)
+
+    # merge existing details dict with extra_props
+    opsgenie_alert_params.alert_details = {**opsgenie_alert_params.alert_details, **extra_props}
 
     # update alias if not set
     # Alias: serviceid-<path>-<exception-name>-ALERT_EXCEPTION_ALIAS
@@ -182,7 +186,8 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
         logger.exception(e)
 
 
-def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params:OpsgenieAlertParams=None):
+def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params:OpsgenieAlertParams=None,
+                       extra_props: Dict[str,str] = {}):
 
     trace_back = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
 
@@ -190,6 +195,9 @@ def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params
     # add url info into details
     opsgenie_alert_params.alert_details["exception"] = str(exception)
     opsgenie_alert_params.alert_details["Traceback"] = trace_back
+
+    # merge existing details dict with extra_props
+    opsgenie_alert_params.alert_details = {**opsgenie_alert_params.alert_details, **extra_props}
 
     # update alias if not set
     # Alias: serviceid-funcname-exception-name-ALERT_ALIAS
@@ -228,7 +236,8 @@ def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params
 
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
                          alert_status_class:Optional[str] = None, elapsed_time:Optional[int] = None,
-                         exception=None, opsgenie_alert_params:OpsgenieAlertParams=None, response_status_code: int=None, func_name:str=None):
+                         exception=None, opsgenie_alert_params:OpsgenieAlertParams=None, response_status_code: int=None,
+                         func_name:str=None, extra_props: Dict[str,str] = {}):
 
     if alert_type == AlertType.STATUS_ALERT:
         if alert_status_code:
@@ -241,8 +250,10 @@ def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional
                                      opsgenie_alert_params=opsgenie_alert_params)
 
     if alert_type == AlertType.EXCEPTION:
-        raise_opsgenie_exception_alert(exception=exception, opsgenie_alert_params=opsgenie_alert_params)
+        raise_opsgenie_exception_alert(exception=exception, opsgenie_alert_params=opsgenie_alert_params,
+                                       extra_props=extra_props)
 
     if alert_type == AlertType.MANUAL:
-        raise_manual_alert(exception=exception, func_name=func_name, opsgenie_alert_params=opsgenie_alert_params)
+        raise_manual_alert(exception=exception, func_name=func_name, opsgenie_alert_params=opsgenie_alert_params,
+                           extra_props=extra_props)
 
