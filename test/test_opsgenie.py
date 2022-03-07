@@ -167,7 +167,8 @@ class TestOpsgenie(unittest.TestCase):
         self.assertEqual(mock_opsgenie_exception_alert.call_count, 1)
         mock_opsgenie_exception_alert.assert_called_with(
             exception=test_exception,
-            opsgenie_alert_params=self.opsgenie_alert_params
+            opsgenie_alert_params=self.opsgenie_alert_params,
+            extra_props=mock.ANY
         )
 
         _ = raise_opsgenie_alert(alert_type=AlertType.MANUAL, exception=test_manual_exception, func_name=test_func_name, opsgenie_alert_params=self.opsgenie_alert_params)
@@ -175,5 +176,6 @@ class TestOpsgenie(unittest.TestCase):
         mock_raise_manual_alert.assert_called_with(
             exception=test_manual_exception,
             opsgenie_alert_params=self.opsgenie_alert_params,
-            func_name=test_func_name
+            func_name=test_func_name,
+            extra_props=mock.ANY
         )

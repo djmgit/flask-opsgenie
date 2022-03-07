@@ -2,7 +2,7 @@ import os
 import re
 import socket
 import time
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from flask import Flask, request, Response, g, _app_ctx_stack as stack
 from flask_opsgenie.opsgenie import raise_opsgenie_alert
@@ -150,8 +150,10 @@ class FlaskOpsgenie(object):
 
         return response
 
-    def raise_exception_alert(self, alert_type:AlertType = None, exception=None, func_name:str=None):
-        raise_opsgenie_alert(alert_type=alert_type, exception=exception, func_name=func_name, opsgenie_alert_params=self.opsgenie_params_util())
+    def raise_exception_alert(self, alert_type:AlertType = None, exception=None, func_name:str=None,
+                              extra_props: Dict[str,str] = {}):
+        raise_opsgenie_alert(alert_type=alert_type, exception=exception, func_name=func_name, opsgenie_alert_params=self.opsgenie_params_util(),
+                             extra_props=extra_props)
 
     def raise_gevent_exception_alert(self, greenlet):
         try:
