@@ -4,7 +4,7 @@ from requests import HTTPError
 import traceback
 from typing import Any, Dict, Optional
 from flask import request
-from flask_opsgenie.entities import AlertType, OpsgenieAlertParams
+from flask_opsgenie.entities import AlertType, OpsgenieAlertParams, AlertPriority
 
 logger = logging.getLogger(__name__)
 
@@ -237,7 +237,14 @@ def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params
 def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional[int] = None, \
                          alert_status_class:Optional[str] = None, elapsed_time:Optional[int] = None,
                          exception=None, opsgenie_alert_params:OpsgenieAlertParams=None, response_status_code: int=None,
-                         func_name:str=None, extra_props: Dict[str,str] = {}):
+                         func_name:str=None, extra_props: Dict[str,str] = {}, alert_priority: str = ''):
+
+    # handle overrides
+    if alert_priority != '':
+        try:
+            opsgenie_alert_params.alert_priority = AlertPriority(alert_priority)
+        except ValueError as e:
+            logger.exception(e)
 
     if alert_type == AlertType.STATUS_ALERT:
         if alert_status_code:
