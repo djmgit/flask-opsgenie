@@ -151,9 +151,9 @@ class FlaskOpsgenie(object):
         return response
 
     def raise_exception_alert(self, alert_type:AlertType = None, exception=None, func_name:str=None,
-                              extra_props: Dict[str,str] = {}):
+                              extra_props: Dict[str,str] = {}, alert_priority: str = ''):
         raise_opsgenie_alert(alert_type=alert_type, exception=exception, func_name=func_name, opsgenie_alert_params=self.opsgenie_params_util(),
-                             extra_props=extra_props)
+                             extra_props=extra_props, alert_priority=alert_priority)
 
     def raise_gevent_exception_alert(self, greenlet):
         try:
