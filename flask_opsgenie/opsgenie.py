@@ -145,7 +145,7 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
 
     # update alias if not set
     # Alias: serviceid-<path>-<exception-name>-ALERT_EXCEPTION_ALIAS
-    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{endpoint}-{str(exception).replace(" ", "_")}'
+    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{endpoint}-{exception.__class__.__name__}'
     if opsgenie_alert_params.alert_exception_alias:
         opsgenie_alert_params.alert_exception_alias = alias + "-" + opsgenie_alert_params.alert_exception_alias
     else:
@@ -186,7 +186,7 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
         logger.exception(e)
 
 
-def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params:OpsgenieAlertParams=None,
+def raise_manual_alert(exception:Exception=None, func_name:str=None, opsgenie_alert_params:OpsgenieAlertParams=None,
                        extra_props: Dict[str,str] = {}):
 
     trace_back = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
@@ -201,7 +201,7 @@ def raise_manual_alert(exception=None, func_name:str=None, opsgenie_alert_params
 
     # update alias if not set
     # Alias: serviceid-funcname-exception-name-ALERT_ALIAS
-    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{func_name}-{exception_str}'
+    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{func_name}-{exception.__class__.__name__}'
     if opsgenie_alert_params.alert_alias:
         opsgenie_alert_params.alert_alias = alias + "-" + opsgenie_alert_params.alert_alias
     else:

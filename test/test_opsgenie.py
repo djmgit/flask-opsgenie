@@ -83,6 +83,7 @@ class TestOpsgenie(unittest.TestCase):
 
         mock_exception.__traceback__ = ""
         mock_traceback.format_exception.return_value = ""
+        dummy_exception_class = "MagicMock"
 
         app = Flask(__name__)
         with app.test_client() as client:
@@ -92,7 +93,7 @@ class TestOpsgenie(unittest.TestCase):
             self.assertEqual(self.opsgenie_alert_params.alert_details['method'], "GET")
             self.assertEqual(self.opsgenie_alert_params.alert_details['url'], 'http://localhost/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['exception'], str(mock_exception))
-            self.assertEqual(self.opsgenie_alert_params.alert_exception_alias, f'fake_service-/test/og_params-{str(mock_exception).replace(" ", "_")}')
+            self.assertEqual(self.opsgenie_alert_params.alert_exception_alias, f'fake_service-/test/og_params-{dummy_exception_class}')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
                 http_verb="post",
@@ -109,6 +110,7 @@ class TestOpsgenie(unittest.TestCase):
         mock_exception.__traceback__ = ""
         mock_traceback.format_exception.return_value = ""
         test_func_name = "test_func_name"
+        dummy_exception_class = "MagicMock"
 
         app = Flask(__name__)
         with app.test_client() as client:
@@ -116,7 +118,7 @@ class TestOpsgenie(unittest.TestCase):
             _ = raise_manual_alert(exception=mock_exception, func_name=test_func_name, opsgenie_alert_params=self.opsgenie_alert_params)
             self.assertEqual(self.opsgenie_alert_params.alert_details['exception'], str(mock_exception))
             self.assertEqual(self.opsgenie_alert_params.alert_details['Traceback'], "")
-            self.assertEqual(self.opsgenie_alert_params.alert_alias, f'fake_service-{test_func_name}-{str(mock_exception).replace(" ", "_")}')
+            self.assertEqual(self.opsgenie_alert_params.alert_alias, f'fake_service-{test_func_name}-{dummy_exception_class}')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
                 http_verb="post",
