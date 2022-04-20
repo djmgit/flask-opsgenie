@@ -29,6 +29,7 @@ CONFIG_OPSGENIE_API_BASE = "OPSGENIE_API_BASE"
 CONFIG_SERVICE_ID = "SERVICE_ID"
 CONFIG_ALERT_EXCEPTION = "ALERT_EXCEPTION"
 CONFIG_NO_TRACEBACK = "NO_TRACEBACK"
+CONFIG_FORWARDED_HEADER_KEYS = "FORWARDED_HEADER_KEYS"
 OPSGENIE_API_BASE_US = "https://api.opsgenie.com"
 
 
@@ -55,13 +56,14 @@ class FlaskOpsgenie(object):
         self._responder = None
         self._opsgenie_api_base = None
         self._service_id = None
+        self._forwarded_header_keys = None
 
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app: Flask):
 
-        self._alert_status_codes = app.config.get(CONFIG_ALERT_STATUS_CODES)
+        self._alert_status_codes =  [int(x) for x in app.config.get(CONFIG_ALERT_STATUS_CODES)]
         self._alert_status_classes = app.config.get(CONFIG_ALERT_STATUS_CLASSES)
         self._monitored_endpoints = app.config.get(CONFIG_MONITORED_ENDPOINTS)
         self._ignored_endpoints = app.config.get(CONFIG_IGNORED_ENDPOINTS)
@@ -80,6 +82,7 @@ class FlaskOpsgenie(object):
         self._service_id = app.config.get(CONFIG_SERVICE_ID)
         self._alert_exception = app.config.get(CONFIG_ALERT_EXCEPTION, False)
         self._no_traceback = app.config.get(CONFIG_NO_TRACEBACK, False)
+        self._forwarded_header_keys = app.config.get(CONFIG_FORWARDED_HEADER_KEYS, False)
         self._host = socket.gethostname()
 
         # pre-process status_class list if present
@@ -130,23 +133,34 @@ class FlaskOpsgenie(object):
         status_code = status_code.value if type(status_code) == HTTPStatus else status_code
         status_class = self._get_status_class(status_code)
         endpoint = request.path
+        extra_props = {}
+
+        # Fetching Request header values
+        if self._forwarded_header_keys:
+            for header_key in self._forwarded_header_keys:
+                extra_props[header_key] = request.headers.get(header_key, None)
 
         if (self._alert_status_codes and status_code in self._alert_status_codes) or \
                 (self._alert_status_classes and status_class in self._alert_status_classes):
             if (self._monitored_endpoints and self._path_present(endpoint, self._monitored_endpoints)) or \
                     (not self._monitored_endpoints and not(self._ignored_endpoints and self._path_present(endpoint, self._ignored_endpoints))):
                 if self._alert_status_codes and status_code in self._alert_status_codes:
+
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_code=status_code,
-                                         opsgenie_alert_params=self.opsgenie_params_util(), response_status_code=status_code)
+                                         opsgenie_alert_params=self.opsgenie_params_util(), response_status_code=status_code,
+                                         extra_props=extra_props)
+
                 elif self._alert_status_classes and status_class in self._alert_status_classes:
                     raise_opsgenie_alert(AlertType.STATUS_ALERT, alert_status_class=status_class,
-                                         opsgenie_alert_params=self.opsgenie_params_util(), response_status_code=status_code)
+                                         opsgenie_alert_params=self.opsgenie_params_util(), response_status_code=status_code,
+                                         extra_props=extra_props)
 
         if self._threshold_response_time and self._response_time_monitored_endpoints and \
                 self._path_present(endpoint, self._response_time_monitored_endpoints) \
                 and elapsed_time > self._threshold_response_time:
+
             raise_opsgenie_alert(AlertType.LATENCY_ALERT, elapsed_time=elapsed_time, alert_status_code=status_code,
-                                 opsgenie_alert_params=self.opsgenie_params_util())
+                                 opsgenie_alert_params=self.opsgenie_params_util(), extra_props=extra_props)
 
         return response
 
@@ -159,7 +173,13 @@ class FlaskOpsgenie(object):
         try:
             greenlet.get()
         except Exception as e:
-            self.raise_exception_alert(alert_type=AlertType.MANUAL, exception=e, func_name="gevent")
+            # Fetching Request header values
+            extra_props = {}
+            if self._forwarded_header_keys:
+                for header_key in self._forwarded_header_keys:
+                    extra_props[header_key] = request.headers.get(header_key, None)
+
+            self.raise_exception_alert(alert_type=AlertType.MANUAL, exception=e, func_name="gevent", extra_props=extra_props)
 
     def gevent_exception_callback(self, g):
         g.link_exception(self.raise_gevent_exception_alert)
