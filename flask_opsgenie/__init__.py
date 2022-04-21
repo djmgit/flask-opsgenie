@@ -133,7 +133,6 @@ class FlaskOpsgenie(object):
         status_code = status_code.value if type(status_code) == HTTPStatus else status_code
         status_class = self._get_status_class(status_code)
         endpoint = request.path
-        extra_props = {}
 
         # Fetching Request header values
         extra_props = self._extract_request_header()
