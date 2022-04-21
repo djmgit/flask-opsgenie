@@ -136,9 +136,7 @@ class FlaskOpsgenie(object):
         extra_props = {}
 
         # Fetching Request header values
-        if self._forwarded_header_keys:
-            for header_key in self._forwarded_header_keys:
-                extra_props[header_key] = request.headers.get(header_key, None)
+        extra_props = self._extract_request_header()
 
         if (self._alert_status_codes and status_code in self._alert_status_codes) or \
                 (self._alert_status_classes and status_class in self._alert_status_classes):
@@ -174,12 +172,17 @@ class FlaskOpsgenie(object):
             greenlet.get()
         except Exception as e:
             # Fetching Request header values
-            extra_props = {}
-            if self._forwarded_header_keys:
-                for header_key in self._forwarded_header_keys:
-                    extra_props[header_key] = request.headers.get(header_key, None)
-
+            extra_props = self._extract_request_header()
             self.raise_exception_alert(alert_type=AlertType.MANUAL, exception=e, func_name="gevent", extra_props=extra_props)
 
     def gevent_exception_callback(self, g):
         g.link_exception(self.raise_gevent_exception_alert)
+
+
+    def _extract_request_header(self):
+        extra_props = {}
+        if self._forwarded_header_keys:
+            for header_key in self._forwarded_header_keys:
+                extra_props[header_key] = request.headers.get(header_key, None)
+
+        return extra_props
