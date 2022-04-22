@@ -57,13 +57,14 @@ class FlaskOpsgenie(object):
         self._opsgenie_api_base = None
         self._service_id = None
         self._forwarded_header_keys = None
+        self._request_headers = None
 
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app: Flask):
 
-        self._alert_status_codes =  [int(x) for x in app.config.get(CONFIG_ALERT_STATUS_CODES)]
+        self._alert_status_codes =  [int(x) for x in app.config.get(CONFIG_ALERT_STATUS_CODES, [])]
         self._alert_status_classes = app.config.get(CONFIG_ALERT_STATUS_CLASSES)
         self._monitored_endpoints = app.config.get(CONFIG_MONITORED_ENDPOINTS)
         self._ignored_endpoints = app.config.get(CONFIG_IGNORED_ENDPOINTS)
@@ -120,6 +121,7 @@ class FlaskOpsgenie(object):
         return any(match_results)
 
     def _before_request(self):
+        self._request_headers = request.headers
         ctx = stack.top
         ctx._flask_request_begin_at = time.time()
 
@@ -182,6 +184,6 @@ class FlaskOpsgenie(object):
         extra_props = {}
         if self._forwarded_header_keys:
             for header_key in self._forwarded_header_keys:
-                extra_props[header_key] = request.headers.get(header_key, None)
+                extra_props[header_key] = self._request_headers.get(header_key, None)
 
         return extra_props
