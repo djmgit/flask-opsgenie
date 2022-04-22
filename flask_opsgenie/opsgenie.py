@@ -23,7 +23,7 @@ def make_opsgenie_api_request(http_verb:str="get", url:str=None, payload:Dict[st
 
 
 def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_status_class:Optional[str] = None,
-                                opsgenie_alert_params:OpsgenieAlertParams=None, response_status_code: int=None):
+                                opsgenie_alert_params:OpsgenieAlertParams=None, response_status_code: int=None, extra_props:Dict[str, str] = {}):
 
     endpoint = request.path
     url = request.url
@@ -35,6 +35,9 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
     opsgenie_alert_params.alert_details["endpoint"] = endpoint
     opsgenie_alert_params.alert_details["url"] = url
     opsgenie_alert_params.alert_details["method"] = method
+
+    # Add header values to alert_details
+    opsgenie_alert_params.alert_details = {**opsgenie_alert_params.alert_details, **extra_props}
 
     # update the status code/class as well in details, will help in searching
     if alert_status_code:
@@ -84,7 +87,7 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
         logger.exception(e)
 
 
-def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgenie_alert_params:OpsgenieAlertParams=None):
+def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgenie_alert_params:OpsgenieAlertParams=None, extra_props:Dict[str, str] = {}):
     endpoint = request.path
     url = request.url
     method = request.method
@@ -94,6 +97,9 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     opsgenie_alert_params.alert_details["url"] = url
     opsgenie_alert_params.alert_details["method"] = method
     opsgenie_alert_params.alert_details["status_code"] = alert_status_code
+
+    # Add header values to alert_details
+    opsgenie_alert_params.alert_details = {**opsgenie_alert_params.alert_details, **extra_props}
 
     # update alias if not set
     if not opsgenie_alert_params.alert_latency_alias:
@@ -248,13 +254,15 @@ def raise_opsgenie_alert(alert_type:AlertType = None, alert_status_code:Optional
 
     if alert_type == AlertType.STATUS_ALERT:
         if alert_status_code:
-            raise_opsgenie_status_alert(alert_status_code=alert_status_code, opsgenie_alert_params=opsgenie_alert_params, response_status_code=response_status_code)
+            raise_opsgenie_status_alert(alert_status_code=alert_status_code, opsgenie_alert_params=opsgenie_alert_params,
+                                        response_status_code=response_status_code, extra_props=extra_props)
         elif alert_status_class:
-            raise_opsgenie_status_alert(alert_status_class=alert_status_class, opsgenie_alert_params=opsgenie_alert_params, response_status_code=response_status_code)
+            raise_opsgenie_status_alert(alert_status_class=alert_status_class, opsgenie_alert_params=opsgenie_alert_params,
+                                        response_status_code=response_status_code, extra_props=extra_props)
 
     if alert_type == AlertType.LATENCY_ALERT:
         raise_opsgenie_latency_alert(elapsed_time=elapsed_time, alert_status_code=alert_status_code,
-                                     opsgenie_alert_params=opsgenie_alert_params)
+                                     opsgenie_alert_params=opsgenie_alert_params, extra_props=extra_props)
 
     if alert_type == AlertType.EXCEPTION:
         raise_opsgenie_exception_alert(exception=exception, opsgenie_alert_params=opsgenie_alert_params,

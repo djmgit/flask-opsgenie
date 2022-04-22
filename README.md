@@ -310,8 +310,19 @@ present then ```ALERT_ALIAS``` value is used. If that too is not present then ``
 
 - **ALERT_PRIORITY** : One of ```P1|P2|P3|P4|P5```. Default is P4.
 
+- **FORWARDED_HEADER_KEYS** : Takes a list of request header keys and add its value to Opsgenie Alert in detail section. Usually, it is used to send ```request_id``` from headers to help in tracing
+
 - **RESPONDER** : The responder of your alert. Takes in a list of dictionary same as that accepted by the Opsgenie alert API. More can be found
 <a href="https://docs.opsgenie.com/docs/alert-api"> here </a> under responder field example. An example for adding an user can be
 ```[{"type": "user","username": "user@domain.com"}]```
 
+
+
+## Enriching Opsgenie Alert with extra information
+
+Sometimes, it is required to add extra details to Opsgenie alerts via alert-details. You can add any details in key:value pair via Flask-Opsgenie function ```raise_exception_alert```
+
+- **extra_props** : This is a dictionary type object. You can send any data you want and it'll be added to Opsgenie alert in detail section. Good example can be function name. 
+
+- **alert_priority** : Alert-Priority can be overridden while invoking function ```raise_exception_alert```. One of ```P1|P2|P3|P4|P5```
 

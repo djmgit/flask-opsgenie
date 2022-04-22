@@ -39,12 +39,13 @@ class TestOpsgenie(unittest.TestCase):
         app = Flask(__name__)
         with app.test_client() as client:
             rv = client.get('/test/og_params')
-            _ = raise_opsgenie_status_alert(alert_status_code=500, alert_status_class=None, opsgenie_alert_params=self.opsgenie_alert_params, response_status_code=500)
+            _ = raise_opsgenie_status_alert(alert_status_code=500, alert_status_class=None, opsgenie_alert_params=self.opsgenie_alert_params, response_status_code=500, extra_props={'test-key': 'test-value'})
             self.assertEqual(self.opsgenie_alert_params.alert_details['endpoint'], '/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['method'], "GET")
             self.assertEqual(self.opsgenie_alert_params.alert_details['url'], 'http://localhost/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['status_code'], 500)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('status_class'), None)
+            self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
             self.assertEqual(self.opsgenie_alert_params.alert_status_alias, 'fake_service-/test/og_params-500')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
@@ -61,12 +62,13 @@ class TestOpsgenie(unittest.TestCase):
         app = Flask(__name__)
         with app.test_client() as client:
             rv = client.get('/test/og_params')
-            _ = raise_opsgenie_latency_alert(elapsed_time=2000, alert_status_code=500, opsgenie_alert_params=self.opsgenie_alert_params)
+            _ = raise_opsgenie_latency_alert(elapsed_time=2000, alert_status_code=500, opsgenie_alert_params=self.opsgenie_alert_params, extra_props={'test-key': 'test-value'})
             self.assertEqual(self.opsgenie_alert_params.alert_details['endpoint'], '/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['method'], "GET")
             self.assertEqual(self.opsgenie_alert_params.alert_details['url'], 'http://localhost/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['status_code'], 500)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('status_class'), None)
+            self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
             self.assertEqual(self.opsgenie_alert_params.alert_latency_alias, 'fake_service-response-latency-alert')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
@@ -88,11 +90,12 @@ class TestOpsgenie(unittest.TestCase):
         app = Flask(__name__)
         with app.test_client() as client:
             rv = client.get('/test/og_params')
-            _ = raise_opsgenie_exception_alert(exception=mock_exception, opsgenie_alert_params=self.opsgenie_alert_params)
+            _ = raise_opsgenie_exception_alert(exception=mock_exception, opsgenie_alert_params=self.opsgenie_alert_params, extra_props={'test-key': 'test-value'})
             self.assertEqual(self.opsgenie_alert_params.alert_details['endpoint'], '/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['method'], "GET")
             self.assertEqual(self.opsgenie_alert_params.alert_details['url'], 'http://localhost/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['exception'], str(mock_exception))
+            self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
             self.assertEqual(self.opsgenie_alert_params.alert_exception_alias, f'fake_service-/test/og_params-{dummy_exception_class}')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
@@ -115,9 +118,10 @@ class TestOpsgenie(unittest.TestCase):
         app = Flask(__name__)
         with app.test_client() as client:
             rv = client.get('/test/og_params')
-            _ = raise_manual_alert(exception=mock_exception, func_name=test_func_name, opsgenie_alert_params=self.opsgenie_alert_params)
+            _ = raise_manual_alert(exception=mock_exception, func_name=test_func_name, opsgenie_alert_params=self.opsgenie_alert_params, extra_props={'test-key': 'test-value'})
             self.assertEqual(self.opsgenie_alert_params.alert_details['exception'], str(mock_exception))
             self.assertEqual(self.opsgenie_alert_params.alert_details['Traceback'], "")
+            self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
             self.assertEqual(self.opsgenie_alert_params.alert_alias, f'fake_service-{test_func_name}-{dummy_exception_class}')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
@@ -147,7 +151,8 @@ class TestOpsgenie(unittest.TestCase):
         mock_opsgenie_status_alert.assert_called_with(
             alert_status_code=test_status_code,
             opsgenie_alert_params=self.opsgenie_alert_params,
-            response_status_code=test_status_code
+            response_status_code=test_status_code,
+            extra_props=mock.ANY
         )
         _ = raise_opsgenie_alert(alert_type=AlertType.STATUS_ALERT, alert_status_class=test_status_class,
                                  elapsed_time = None, opsgenie_alert_params=self.opsgenie_alert_params, response_status_code=test_status_code)
@@ -155,7 +160,8 @@ class TestOpsgenie(unittest.TestCase):
         mock_opsgenie_status_alert.assert_called_with(
             alert_status_class=test_status_class,
             opsgenie_alert_params=self.opsgenie_alert_params,
-            response_status_code=test_status_code
+            response_status_code=test_status_code,
+            extra_props=mock.ANY
         )
         _ = raise_opsgenie_alert(alert_type=AlertType.LATENCY_ALERT, alert_status_code=test_status_code,
                                  elapsed_time=test_elapsed_time, opsgenie_alert_params=self.opsgenie_alert_params)
@@ -163,7 +169,8 @@ class TestOpsgenie(unittest.TestCase):
         mock_opsgenie_latency_alert.assert_called_with(
             elapsed_time=test_elapsed_time,
             alert_status_code=test_status_code,
-            opsgenie_alert_params=self.opsgenie_alert_params
+            opsgenie_alert_params=self.opsgenie_alert_params,
+            extra_props=mock.ANY
         )
         _ = raise_opsgenie_alert(alert_type=AlertType.EXCEPTION, exception=test_exception, opsgenie_alert_params=self.opsgenie_alert_params)
         self.assertEqual(mock_opsgenie_exception_alert.call_count, 1)
