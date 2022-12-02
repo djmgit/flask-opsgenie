@@ -1,5 +1,6 @@
 import logging
 import requests
+import sys
 from requests import HTTPError
 import traceback
 from typing import Any, Dict, Optional
@@ -177,8 +178,12 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
 
     # if traceback is not silenced then add traceback
     if not opsgenie_alert_params.no_traceback:
-        traceback_str = "".join(traceback.format_exception(etype=type(exception),
-                                                           value=exception, tb=exception.__traceback__))
+        if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+            traceback_str = "".join(traceback.format_exception(exception))
+        else:
+            traceback_str = "".join(traceback.format_exception(etype=type(exception),
+                                                               value=exception,
+                                                               tb=exception.__traceback__))
         payload["description"] = f'{description} {traceback_str}'
         payload["details"]["Traceback"] = traceback_str
 
@@ -195,7 +200,10 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
 def raise_manual_alert(exception:Exception=None, func_name:str=None, opsgenie_alert_params:OpsgenieAlertParams=None,
                        extra_props: Dict[str,str] = {}):
 
-    trace_back = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+        trace_back = "".join(traceback.format_exception(exception))
+    else:
+        trace_back = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
 
     exception_str = str(exception).replace(' ', '_')
     # add url info into details
