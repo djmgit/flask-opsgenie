@@ -13,6 +13,19 @@ def __exception_to_string(exception: Exception) -> str:
     try:
         return str(exception)
     except RecursionError:
+        '''
+        On some cases when an exception is raised from another exception
+        for example:
+        try:
+            a = 1/0
+        exception Exception as e:
+            raise MyException() from e
+        if we try to call str on the raised MyException then
+        python throws:
+        RecursionError: maximum recursion depth exceeded while getting the str of an object
+        Hence we handle that case here by returning the topmost exception
+        from the traceback list.
+        '''
         if sys.version_info.major == 3 and sys.version_info.minor >= 10:
             trace_back = traceback.format_exception(exception)
         else:
