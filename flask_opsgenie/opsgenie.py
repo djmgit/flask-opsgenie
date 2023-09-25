@@ -9,6 +9,15 @@ from flask_opsgenie.entities import AlertType, OpsgenieAlertParams, AlertPriorit
 
 logger = logging.getLogger(__name__)
 
+def __exception_to_string(exception: Exception) -> str:
+    try:
+        return str(exception)
+    except RecursionError:
+        if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+            trace_back = traceback.format_exception(exception)
+        else:
+            trace_back = traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__)
+        return trace_back[-1]
 
 def make_opsgenie_api_request(http_verb:str="get", url:str=None, payload:Dict[str, Any]=None, opsgenie_token:str=None):
 
@@ -145,7 +154,7 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     opsgenie_alert_params.alert_details["endpoint"] = endpoint
     opsgenie_alert_params.alert_details["url"] = url
     opsgenie_alert_params.alert_details["method"] = method
-    opsgenie_alert_params.alert_details["exception"] = str(exception)
+    opsgenie_alert_params.alert_details["exception"] = __exception_to_string(exception)
 
     # merge existing details dict with extra_props
     opsgenie_alert_params.alert_details = {**opsgenie_alert_params.alert_details, **extra_props}
@@ -158,8 +167,8 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
     else:
         opsgenie_alert_params.alert_exception_alias = alias
 
-    summary = f'{endpoint} threw exception : {str(exception)} | Alert generated from {opsgenie_alert_params.alert_details["service_id"]}'
-    description = f'{endpoint} has thrown exception : {str(exception)}. Complete URL : {url} called with method ' \
+    summary = f'{endpoint} threw exception : {__exception_to_string(exception)} | Alert generated from {opsgenie_alert_params.alert_details["service_id"]}'
+    description = f'{endpoint} has thrown exception : {__exception_to_string(exception)}. Complete URL : {url} called with method ' \
                     f'{method}. Endpoint served by service : {opsgenie_alert_params.alert_details["service_id"]} on host: ' \
                     f'{opsgenie_alert_params.alert_details["host"]}.'
 
@@ -205,9 +214,9 @@ def raise_manual_alert(exception:Exception=None, func_name:str=None, opsgenie_al
     else:
         trace_back = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
 
-    exception_str = str(exception).replace(' ', '_')
+    exception_str = __exception_to_string(exception).replace(' ', '_')
     # add url info into details
-    opsgenie_alert_params.alert_details["exception"] = str(exception)
+    opsgenie_alert_params.alert_details["exception"] = __exception_to_string(exception)
     opsgenie_alert_params.alert_details["Traceback"] = trace_back
 
     # merge existing details dict with extra_props
