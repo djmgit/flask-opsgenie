@@ -2,9 +2,10 @@ import os
 import re
 import socket
 import time
+from types import SimpleNamespace
 from typing import List, Optional, Dict
 
-from flask import Flask, request, Response, g, _app_ctx_stack as stack
+from flask import Flask, request, Response, g
 from flask_opsgenie.opsgenie import raise_opsgenie_alert
 from flask_opsgenie.entities import AlertType
 from flask_opsgenie.entities import OpsgenieAlertParams
@@ -125,12 +126,11 @@ class FlaskOpsgenie(object):
 
     def _before_request(self):
         self._request_headers = request.headers
-        ctx = stack.top
-        ctx._flask_request_begin_at = time.time()
+        g._flask_opsgenie = SimpleNamespace()
+        g._flask_opsgenie._flask_request_begin_at = time.time()
 
     def _after_request(self, response: Response):
-        ctx = stack.top
-        elapsed_time = (time.time() - ctx._flask_request_begin_at) * 1000
+        elapsed_time = (time.time() - g._flask_opsgenie._flask_request_begin_at) * 1000
 
         status_code = response.status_code
 
