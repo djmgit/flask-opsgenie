@@ -70,7 +70,7 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
 
     # update alias if not set
     # Alias: serviceID-<path>-<status-code>-ALERT_STATUS_ALIAS
-    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{request.path}-{response_status_code}'
+    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{request.path}-{response_status_code}-{opsgenie_alert_params.envtype}'
     if opsgenie_alert_params.alert_status_alias:
         opsgenie_alert_params.alert_status_alias = alias + "-" + opsgenie_alert_params.alert_status_alias
     else:
@@ -125,8 +125,11 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
     opsgenie_alert_params.alert_details = {**opsgenie_alert_params.alert_details, **extra_props}
 
     # update alias if not set
+    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert-{opsgenie_alert_params.envtype}'
     if not opsgenie_alert_params.alert_latency_alias:
-        opsgenie_alert_params.alert_latency_alias = f'{opsgenie_alert_params.alert_details["service_id"]}-response-latency-alert'
+        opsgenie_alert_params.alert_latency_alias = alias
+    else:
+        opsgenie_alert_params.alert_latency_alias = f"{opsgenie_alert_params.alert_exception_alias}-{alias}"
 
     summary = f'{endpoint} showed unexpected response time : {elapsed_time}ms | Alert generated from flask'
     description = f'{endpoint} showed unexpected response time : {elapsed_time}ms. Complete URL : {url} called with method ' \
@@ -174,7 +177,7 @@ def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_para
 
     # update alias if not set
     # Alias: serviceid-<path>-<exception-name>-ALERT_EXCEPTION_ALIAS
-    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{endpoint}-{exception.__class__.__name__}'
+    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{endpoint}-{exception.__class__.__name__}-{opsgenie_alert_params.envtype}'
     if opsgenie_alert_params.alert_exception_alias:
         opsgenie_alert_params.alert_exception_alias = alias + "-" + opsgenie_alert_params.alert_exception_alias
     else:
@@ -237,7 +240,7 @@ def raise_manual_alert(exception:Exception=None, func_name:str=None, opsgenie_al
 
     # update alias if not set
     # Alias: serviceid-funcname-exception-name-ALERT_ALIAS
-    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{func_name}-{exception.__class__.__name__}'
+    alias = f'{opsgenie_alert_params.alert_details["service_id"]}-{func_name}-{exception.__class__.__name__}-{opsgenie_alert_params.envtype}'
     if opsgenie_alert_params.alert_alias:
         opsgenie_alert_params.alert_alias = alias + "-" + opsgenie_alert_params.alert_alias
     else:
