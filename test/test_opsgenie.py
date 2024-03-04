@@ -32,7 +32,6 @@ class TestOpsgenie(unittest.TestCase):
         self.assertEqual(mock_get.call_count, 1)
         _ = make_opsgenie_api_request(http_verb="post", url=mock.ANY, payload=mock.ANY, opsgenie_token=mock.ANY)
         self.assertEqual(mock_post.call_count, 1)
-
     @mock.patch('flask_opsgenie.opsgenie.make_opsgenie_api_request')
     def test_raise_opsgenie_status_alert(self, mock_opsgenie_api_request):
 
@@ -46,7 +45,7 @@ class TestOpsgenie(unittest.TestCase):
             self.assertEqual(self.opsgenie_alert_params.alert_details['status_code'], 500)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('status_class'), None)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
-            self.assertEqual(self.opsgenie_alert_params.alert_status_alias, 'fake_service-/test/og_params-500')
+            self.assertEqual(self.opsgenie_alert_params.alert_status_alias, 'fake_service-/test/og_params-500-local')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
                 http_verb="post",
@@ -69,7 +68,7 @@ class TestOpsgenie(unittest.TestCase):
             self.assertEqual(self.opsgenie_alert_params.alert_details['status_code'], 500)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('status_class'), None)
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
-            self.assertEqual(self.opsgenie_alert_params.alert_latency_alias, 'fake_service-response-latency-alert')
+            self.assertEqual(self.opsgenie_alert_params.alert_latency_alias, 'fake_service-response-latency-alert-local')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
                 http_verb="post",
@@ -96,7 +95,7 @@ class TestOpsgenie(unittest.TestCase):
             self.assertEqual(self.opsgenie_alert_params.alert_details['url'], 'http://localhost/test/og_params')
             self.assertEqual(self.opsgenie_alert_params.alert_details['exception'], str(mock_exception))
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
-            self.assertEqual(self.opsgenie_alert_params.alert_exception_alias, f'fake_service-/test/og_params-{dummy_exception_class}')
+            self.assertEqual(self.opsgenie_alert_params.alert_exception_alias, f'fake_service-/test/og_params-{dummy_exception_class}-local')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
                 http_verb="post",
@@ -122,7 +121,7 @@ class TestOpsgenie(unittest.TestCase):
             self.assertEqual(self.opsgenie_alert_params.alert_details['exception'], str(mock_exception))
             self.assertEqual(self.opsgenie_alert_params.alert_details['Traceback'], "")
             self.assertEqual(self.opsgenie_alert_params.alert_details.get('test-key'), 'test-value')
-            self.assertEqual(self.opsgenie_alert_params.alert_alias, f'fake_service-{test_func_name}-{dummy_exception_class}')
+            self.assertEqual(self.opsgenie_alert_params.alert_alias, f'fake_service-{test_func_name}-{dummy_exception_class}-local')
             self.assertEqual(mock_opsgenie_api_request.call_count, 1)
             mock_opsgenie_api_request.assert_called_with(
                 http_verb="post",

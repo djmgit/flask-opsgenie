@@ -31,6 +31,7 @@ CONFIG_ALERT_EXCEPTION = "ALERT_EXCEPTION"
 CONFIG_NO_TRACEBACK = "NO_TRACEBACK"
 CONFIG_FORWARDED_HEADER_KEYS = "FORWARDED_HEADER_KEYS"
 OPSGENIE_API_BASE_US = "https://api.opsgenie.com"
+ENVTYPE = "ENVTYPE"
 
 
 class FlaskOpsgenie(object):
@@ -84,6 +85,7 @@ class FlaskOpsgenie(object):
         self._alert_exception = app.config.get(CONFIG_ALERT_EXCEPTION, False)
         self._no_traceback = app.config.get(CONFIG_NO_TRACEBACK, False)
         self._forwarded_header_keys = app.config.get(CONFIG_FORWARDED_HEADER_KEYS, False)
+        self._envtype = app.config.get(ENVTYPE, "local")
         self._host = socket.gethostname()
 
         # pre-process status_class list if present
@@ -110,7 +112,8 @@ class FlaskOpsgenie(object):
             no_traceback = self._no_traceback,
             alert_priority=self._alert_priority,
             alert_responder=self._responder,
-            opsgenie_api_base=self._opsgenie_api_base
+            opsgenie_api_base=self._opsgenie_api_base,
+            envtype=self._envtype
         )
 
     def _get_status_class(self, status_code: int) -> str:
