@@ -106,7 +106,7 @@ def raise_opsgenie_status_alert(alert_status_code:Optional[str] = None, alert_st
             http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
             opsgenie_token=opsgenie_alert_params.opsgenie_token
         )
-    except HTTPError as e:
+    except Exception as e:
         logger.exception(e)
 
 
@@ -155,7 +155,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
             http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
             opsgenie_token=opsgenie_alert_params.opsgenie_token
         )
-    except HTTPError as e:
+    except Exception as e:
         logger.exception(e)
 
 
@@ -268,7 +268,7 @@ def raise_manual_alert(exception:Exception=None, func_name:str=None, opsgenie_al
             http_verb="post", url=f'{opsgenie_alert_params.opsgenie_api_base}/v2/alerts', payload=payload,
             opsgenie_token=opsgenie_alert_params.opsgenie_token
         )
-    except HTTPError as e:
+    except Exception as e:
         logger.exception(e)
 
 
