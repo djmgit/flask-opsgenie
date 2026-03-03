@@ -14,12 +14,12 @@ this extension with different alert conditions and attributes.
 from setuptools import find_packages, setup
 
 setup(
-    name="flask-opsgenie",
+    name="flask_opsgenie",
     url="https://github.com/djmgit/flask-opsgenie",
     license="",
     author="Deepjyoti Mondal",
     description="Opsgenie extension for Flask",
-    download_url="https://github.com/djmgit/flask-opsgenie/archive/refs/tags/v0.5.3.tar.gz",
+    download_url="https://github.com/djmgit/flask-opsgenie/archive/refs/tags/v0.5.4.tar.gz",
     long_description=__doc__,
     zip_safe=False,
     keywords = ['Alerting', 'flask', 'web', 'Reliability', 'DevOps'],
@@ -36,5 +36,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: System :: Monitoring',
     ],
-    version='0.5.3'
+    version='0.5.4'
 )
