@@ -19,7 +19,7 @@ setup(
     license="",
     author="Deepjyoti Mondal",
     description="Opsgenie extension for Flask",
-    download_url="https://github.com/djmgit/flask-opsgenie/archive/refs/tags/v0.5.1.tar.gz",
+    download_url="https://github.com/djmgit/flask-opsgenie/archive/refs/tags/v0.5.2.tar.gz",
     long_description=__doc__,
     zip_safe=False,
     keywords = ['Alerting', 'flask', 'web', 'Reliability', 'DevOps'],
