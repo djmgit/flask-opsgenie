@@ -162,7 +162,7 @@ def raise_opsgenie_latency_alert(elapsed_time:int, alert_status_code:int, opsgen
 def raise_opsgenie_exception_alert(exception:Exception=None, opsgenie_alert_params:OpsgenieAlertParams=None,
                                    extra_props: Dict[str,str] = {}):                         
     if not has_request_context():
-        raise_manual_alert(exception, "bad_mapping", opsgenie_alert_params, extra_props)
+        return raise_manual_alert(exception, "bad_mapping", opsgenie_alert_params, extra_props)
 
     endpoint = request.path
     url = request.url
